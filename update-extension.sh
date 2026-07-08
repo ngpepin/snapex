@@ -11,7 +11,7 @@ usage() {
   cat <<'USAGE'
 Usage: bash update-extension.sh [options]
 
-Fetch, build, package, and reinstall the latest local SnapEx VSIX from this repository.
+Fetch, build, package, reinstall, and verify the latest local SnapEx VSIX from this repository.
 
 Options:
   --skip-pull          Do not fetch or pull before building.
@@ -152,11 +152,14 @@ log "Uninstalling previous local SnapEx extension ids if present"
 log "Installing $VSIX_FILE"
 "$CODE_CLI" --install-extension "$VSIX_FILE" --force
 
+log "Verifying installed extension"
+VERIFY_PATTERN="^${EXTENSION_ID}@"
+VERIFY_OUTPUT="$("$CODE_CLI" --list-extensions --show-versions | grep "$VERIFY_PATTERN")" \
+  || fail "SnapEx install verification failed. Expected '${EXTENSION_ID}' in VS Code's installed extensions list."
+printf '%s\n' "$VERIFY_OUTPUT"
+
 cat <<EOF
 
-SnapEx ${EXTENSION_VERSION} has been packaged and installed.
+SnapEx ${EXTENSION_VERSION} has been packaged, installed, and verified.
 Reload VS Code to activate the updated extension.
-
-Final verification step, not run by this script:
-  ${CODE_CLI} --list-extensions --show-versions | grep '^${EXTENSION_ID}@'
 EOF
