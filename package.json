@@ -1,7 +1,7 @@
 {
-  "name": "extension-state-backup",
-  "displayName": "Extension State Backup",
-  "description": "Back up installed VS Code extensions, configuration values, and best-effort storage state into separate zip archives, then restore a chosen archive later.",
+  "name": "snapex",
+  "displayName": "SnapEx",
+  "description": "Back up and restore installed VS Code extensions, configuration values, and best-effort storage state into separate zip archives.",
   "version": "0.1.0",
   "publisher": "local-tools",
   "license": "MIT",
@@ -12,60 +12,86 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extensionStateBackup.backupAll",
-    "onCommand:extensionStateBackup.backupSelected",
-    "onCommand:extensionStateBackup.restoreFromZip",
-    "onCommand:extensionStateBackup.openBackupFolder"
+    "onView:snapex.actions",
+    "onCommand:snapex.backupAll",
+    "onCommand:snapex.backupSelected",
+    "onCommand:snapex.restoreFromZip",
+    "onCommand:snapex.openBackupFolder"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "extensionStateBackup.backupAll",
-        "title": "Extension State Backup: Backup All Extensions"
+        "command": "snapex.backupAll",
+        "title": "Backup All Extensions",
+        "category": "SnapEx",
+        "icon": "$(archive)"
       },
       {
-        "command": "extensionStateBackup.backupSelected",
-        "title": "Extension State Backup: Backup Selected Extension"
+        "command": "snapex.backupSelected",
+        "title": "Backup Selected Extension",
+        "category": "SnapEx",
+        "icon": "$(extensions)"
       },
       {
-        "command": "extensionStateBackup.restoreFromZip",
-        "title": "Extension State Backup: Restore Extension from Zip"
+        "command": "snapex.restoreFromZip",
+        "title": "Restore Extension from Zip",
+        "category": "SnapEx",
+        "icon": "$(history)"
       },
       {
-        "command": "extensionStateBackup.openBackupFolder",
-        "title": "Extension State Backup: Open Backup Folder"
+        "command": "snapex.openBackupFolder",
+        "title": "Open Backup Folder",
+        "category": "SnapEx",
+        "icon": "$(folder-opened)"
       }
     ],
     "configuration": {
-      "title": "Extension State Backup",
+      "title": "SnapEx",
       "properties": {
-        "extensionStateBackup.defaultBackupLocation": {
+        "snapex.defaultBackupLocation": {
           "type": "string",
           "default": "",
           "description": "Optional absolute folder path where extension backup runs are written. When empty, you will be prompted each time."
         },
-        "extensionStateBackup.includeBuiltIn": {
+        "snapex.includeBuiltIn": {
           "type": "boolean",
           "default": false,
           "description": "Include built-in VS Code extensions in backup runs. Usually leave this disabled because built-ins are restored by VS Code itself."
         },
-        "extensionStateBackup.includeExtensionFiles": {
+        "snapex.includeExtensionFiles": {
           "type": "boolean",
           "default": true,
           "description": "Include each extension's installed files in its backup archive. Disable this only when you want configuration and storage state snapshots."
         },
-        "extensionStateBackup.includeCurrentWorkspaceStorage": {
+        "snapex.includeCurrentWorkspaceStorage": {
           "type": "boolean",
           "default": true,
           "description": "Include the current workspace storage folder for each extension when available. Other workspaces are not scanned."
         },
-        "extensionStateBackup.confirmBeforeRestore": {
+        "snapex.confirmBeforeRestore": {
           "type": "boolean",
           "default": true,
           "description": "Ask for confirmation before overwriting an installed extension directory, global storage, workspace storage, or configuration values."
         }
       }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "snapex",
+          "title": "SnapEx",
+          "icon": "snapex-icon.png"
+        }
+      ]
+    },
+    "views": {
+      "snapex": [
+        {
+          "id": "snapex.actions",
+          "name": "Actions"
+        }
+      ]
     }
   },
   "scripts": {
@@ -88,5 +114,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ngpepin/snapex.git"
-  }
+  },
+  "icon": "snapex-icon.png"
 }
