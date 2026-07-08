@@ -7,6 +7,54 @@ import AdmZip from 'adm-zip';
 const SELF_EXTENSION_IDS = new Set(['local-tools.snapex', 'local-tools.extension-state-backup']);
 const BACKUP_SCHEMA_VERSION = 2;
 const MIN_SUPPORTED_BACKUP_SCHEMA_VERSION = 1;
+const MAX_EXTERNAL_STATE_FILES_PER_EXTENSION = 500;
+const MAX_EXTERNAL_STATE_FILE_SIZE_BYTES = 25 * 1024 * 1024;
+const MAX_EXTERNAL_STATE_TOTAL_BYTES = 150 * 1024 * 1024;
+
+const EXTERNAL_STATE_DIRECTORY_SKIP_NAMES = new Set([
+  '.cache',
+  '.git',
+  'cache',
+  'caches',
+  'cacheddata',
+  'logs',
+  'node_modules',
+  'out',
+  'temp',
+  'tmp'
+]);
+
+const EXTERNAL_STATE_TOKEN_BLOCKLIST = new Set([
+  'api',
+  'app',
+  'apps',
+  'builtin',
+  'code',
+  'common',
+  'config',
+  'data',
+  'dev',
+  'extension',
+  'extensions',
+  'language',
+  'local',
+  'microsoft',
+  'ms',
+  'sample',
+  'server',
+  'service',
+  'state',
+  'storage',
+  'support',
+  'theme',
+  'tool',
+  'tools',
+  'user',
+  'visualstudio',
+  'vscode',
+  'web',
+  'workspace'
+]);
 
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 
@@ -44,6 +92,17 @@ interface ExternalStateRecord {
   homeRelativePath: string;
   sourcePath: string;
   mode?: number;
+  discoveredBy?: string;
+}
+
+interface ExternalStateCandidate {
+  homeRelativePath: string;
+  discoveredBy: string;
+}
+
+interface ExternalStateCollectionCounters {
+  fileCount: number;
+  totalBytes: number;
 }
 
 interface BackupManifest {
@@ -437,10 +496,10 @@ async function buildManifest(
       externalState: externalStateRecords.length > 0
     },
     notes: [
-      'This backup includes installed extension files, contributed VS Code configuration values, selected external state files, per-extension globalStorage, and current-workspace storage when available.',
+      'This backup includes installed extension files, contributed VS Code configuration values, discovered external state files, per-extension globalStorage, and current-workspace storage when available.',
       'VS Code does not expose another extension\'s SecretStorage, OS keychain entries, authentication sessions, or all private Memento records through the public API, so those items are not included.',
       'Workspace storage is limited to the workspace open when the backup command ran.',
-      'External state files are limited to known extension-owned config files under the user home directory, such as Continue\'s ~/.continue/config.yaml.'
+      'External state discovery uses extension manifest identity fields, contributed configuration key prefixes, repository names, and common per-user config/state directory conventions under the home directory. It is best effort and intentionally size-limited.'
     ]
   };
 }
@@ -520,44 +579,253 @@ function getContributedConfigurationKeys(packageJson: Record<string, unknown>): 
 }
 
 async function collectExternalStateRecords(extension: vscode.Extension<unknown>): Promise<ExternalStateRecord[]> {
-  const records: ExternalStateRecord[] = [];
+  const recordsByHomePath = new Map<string, ExternalStateRecord>();
+  const counters: ExternalStateCollectionCounters = { fileCount: 0, totalBytes: 0 };
 
-  for (const homeRelativePath of getKnownHomeRelativeExternalStatePaths(extension)) {
-    const archiveRelativePath = normalizeHomeRelativePathForArchive(homeRelativePath);
-    if (!archiveRelativePath) {
+  for (const candidate of discoverExternalStateCandidates(extension)) {
+    await collectExternalStateCandidate(candidate, recordsByHomePath, counters);
+
+    if (counters.fileCount >= MAX_EXTERNAL_STATE_FILES_PER_EXTENSION || counters.totalBytes >= MAX_EXTERNAL_STATE_TOTAL_BYTES) {
+      break;
+    }
+  }
+
+  return [...recordsByHomePath.values()].sort((a, b) => a.archivePath.localeCompare(b.archivePath));
+}
+
+function discoverExternalStateCandidates(extension: vscode.Extension<unknown>): ExternalStateCandidate[] {
+  const candidates = new Map<string, ExternalStateCandidate>();
+  const addCandidate = (homeRelativePath: string, discoveredBy: string) => {
+    const normalizedPath = normalizeHomeRelativePathForArchive(homeRelativePath);
+    if (!normalizedPath || candidates.has(normalizedPath)) {
+      return;
+    }
+
+    candidates.set(normalizedPath, { homeRelativePath: normalizedPath, discoveredBy });
+  };
+
+  for (const token of getExternalStateIdentityTokens(extension)) {
+    addCandidate(`.${token}`, `manifest-token:${token}`);
+    addCandidate(path.posix.join('.config', token), `xdg-config-token:${token}`);
+    addCandidate(path.posix.join('.local', 'share', token), `xdg-data-token:${token}`);
+    addCandidate(path.posix.join('Library', 'Application Support', token), `macos-application-support-token:${token}`);
+    addCandidate(path.posix.join('Library', 'Preferences', token), `macos-preferences-token:${token}`);
+    addCandidate(path.posix.join('AppData', 'Roaming', token), `windows-roaming-token:${token}`);
+    addCandidate(path.posix.join('AppData', 'Local', token), `windows-local-token:${token}`);
+
+    for (const extension of ['json', 'jsonc', 'yaml', 'yml', 'toml']) {
+      addCandidate(`.${token}.${extension}`, `hidden-config-file-token:${token}`);
+      addCandidate(path.posix.join('.config', `${token}.${extension}`), `xdg-config-file-token:${token}`);
+    }
+  }
+
+  const publisherToken = normalizeIdentifierToken(asString(extension.packageJSON?.publisher));
+  const nameToken = normalizeIdentifierToken(asString(extension.packageJSON?.name));
+  if (publisherToken && nameToken && !isBlockedExternalStateToken(publisherToken) && !isBlockedExternalStateToken(nameToken)) {
+    addCandidate(path.posix.join('.config', publisherToken, nameToken), `publisher-name-xdg:${publisherToken}/${nameToken}`);
+    addCandidate(path.posix.join('Library', 'Application Support', publisherToken, nameToken), `publisher-name-macos:${publisherToken}/${nameToken}`);
+    addCandidate(path.posix.join('AppData', 'Roaming', publisherToken, nameToken), `publisher-name-windows:${publisherToken}/${nameToken}`);
+  }
+
+  return [...candidates.values()];
+}
+
+function getExternalStateIdentityTokens(extension: vscode.Extension<unknown>): string[] {
+  const packageJson = extension.packageJSON as Record<string, unknown>;
+  const tokens = new Set<string>();
+  const addToken = (value: unknown) => {
+    const token = normalizeIdentifierToken(asString(value));
+    if (!token || isBlockedExternalStateToken(token)) {
+      return;
+    }
+
+    tokens.add(token);
+
+    for (const variant of getSafeTokenVariants(token)) {
+      if (!isBlockedExternalStateToken(variant)) {
+        tokens.add(variant);
+      }
+    }
+  };
+
+  addToken(packageJson.name);
+  addToken(packageJson.displayName);
+  addToken(extension.id.split('.').slice(1).join('.'));
+  addToken(extension.id);
+
+  for (const repositoryName of getRepositoryNameCandidates(packageJson)) {
+    addToken(repositoryName);
+  }
+
+  for (const key of getContributedConfigurationKeys(packageJson)) {
+    addToken(key.split('.')[0]);
+  }
+
+  return [...tokens].sort();
+}
+
+function getSafeTokenVariants(token: string): string[] {
+  const variants = new Set<string>();
+  for (const suffix of ['-vscode', '-extension', '-code']) {
+    if (token.endsWith(suffix) && token.length > suffix.length + 2) {
+      variants.add(token.slice(0, -suffix.length));
+    }
+  }
+
+  return [...variants];
+}
+
+function getRepositoryNameCandidates(packageJson: Record<string, unknown>): string[] {
+  const repository = packageJson.repository;
+  const candidates: string[] = [];
+  const addRepositoryValue = (value: unknown) => {
+    const text = asString(value);
+    if (!text) {
+      return;
+    }
+
+    const withoutGitSuffix = text.replace(/\.git$/i, '');
+    const segments = withoutGitSuffix.split(/[\\/:]+/).filter(Boolean);
+    const lastSegment = segments[segments.length - 1];
+    if (lastSegment) {
+      candidates.push(lastSegment);
+    }
+  };
+
+  if (typeof repository === 'string') {
+    addRepositoryValue(repository);
+  } else {
+    const repositoryRecord = asRecord(repository);
+    if (repositoryRecord) {
+      addRepositoryValue(repositoryRecord.url);
+      addRepositoryValue(repositoryRecord.directory);
+    }
+  }
+
+  return candidates;
+}
+
+async function collectExternalStateCandidate(
+  candidate: ExternalStateCandidate,
+  recordsByHomePath: Map<string, ExternalStateRecord>,
+  counters: ExternalStateCollectionCounters
+): Promise<void> {
+  const sourcePath = safeJoin(getHomeDir(), fromArchivePath(candidate.homeRelativePath));
+
+  try {
+    const stat = await fs.stat(sourcePath);
+    if (stat.isFile()) {
+      addExternalStateFileRecord(candidate, candidate.homeRelativePath, sourcePath, stat, recordsByHomePath, counters);
+    } else if (stat.isDirectory()) {
+      await collectExternalStateDirectory(candidate, sourcePath, candidate.homeRelativePath, recordsByHomePath, counters);
+    }
+  } catch {
+    // Missing candidate external state paths are normal.
+  }
+}
+
+async function collectExternalStateDirectory(
+  candidate: ExternalStateCandidate,
+  sourceDirectory: string,
+  archiveDirectory: string,
+  recordsByHomePath: Map<string, ExternalStateRecord>,
+  counters: ExternalStateCollectionCounters
+): Promise<void> {
+  if (counters.fileCount >= MAX_EXTERNAL_STATE_FILES_PER_EXTENSION || counters.totalBytes >= MAX_EXTERNAL_STATE_TOTAL_BYTES) {
+    return;
+  }
+
+  const entries = await fs.readdir(sourceDirectory, { withFileTypes: true });
+  for (const entry of entries) {
+    if (counters.fileCount >= MAX_EXTERNAL_STATE_FILES_PER_EXTENSION || counters.totalBytes >= MAX_EXTERNAL_STATE_TOTAL_BYTES) {
+      return;
+    }
+
+    if (entry.isSymbolicLink()) {
       continue;
     }
 
-    const sourcePath = safeJoin(getHomeDir(), fromArchivePath(archiveRelativePath));
+    const childSourcePath = path.join(sourceDirectory, entry.name);
+    const childHomeRelativePath = `${archiveDirectory}/${entry.name}`;
 
-    try {
-      const stat = await fs.stat(sourcePath);
-      if (!stat.isFile()) {
+    if (entry.isDirectory()) {
+      if (shouldSkipExternalStateDirectory(entry.name)) {
         continue;
       }
 
-      records.push({
-        archivePath: `externalState/home/${archiveRelativePath}`,
-        homeRelativePath: archiveRelativePath,
-        sourcePath,
-        mode: stat.mode & 0o777
-      });
+      await collectExternalStateDirectory(candidate, childSourcePath, childHomeRelativePath, recordsByHomePath, counters);
+      continue;
+    }
+
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    try {
+      const stat = await fs.stat(childSourcePath);
+      addExternalStateFileRecord(candidate, childHomeRelativePath, childSourcePath, stat, recordsByHomePath, counters);
     } catch {
-      // Missing external state files are normal.
+      // Files may disappear while the backup is running.
     }
   }
-
-  return records.sort((a, b) => a.archivePath.localeCompare(b.archivePath));
 }
 
-function getKnownHomeRelativeExternalStatePaths(extension: vscode.Extension<unknown>): string[] {
-  if (extension.id.toLowerCase() === 'continue.continue') {
-    return [
-      '.continue/config.yaml'
-    ];
+function addExternalStateFileRecord(
+  candidate: ExternalStateCandidate,
+  homeRelativePath: string,
+  sourcePath: string,
+  stat: Awaited<ReturnType<typeof fs.stat>>,
+  recordsByHomePath: Map<string, ExternalStateRecord>,
+  counters: ExternalStateCollectionCounters
+): void {
+  if (recordsByHomePath.has(homeRelativePath)) {
+    return;
   }
 
-  return [];
+  if (stat.size > MAX_EXTERNAL_STATE_FILE_SIZE_BYTES) {
+    return;
+  }
+
+  if (counters.fileCount >= MAX_EXTERNAL_STATE_FILES_PER_EXTENSION || counters.totalBytes + stat.size > MAX_EXTERNAL_STATE_TOTAL_BYTES) {
+    return;
+  }
+
+  recordsByHomePath.set(homeRelativePath, {
+    archivePath: `externalState/home/${homeRelativePath}`,
+    homeRelativePath,
+    sourcePath,
+    mode: stat.mode & 0o777,
+    discoveredBy: candidate.discoveredBy
+  });
+  counters.fileCount += 1;
+  counters.totalBytes += stat.size;
+}
+
+function shouldSkipExternalStateDirectory(name: string): boolean {
+  return EXTERNAL_STATE_DIRECTORY_SKIP_NAMES.has(name.toLowerCase());
+}
+
+function normalizeIdentifierToken(value: string | undefined): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const normalized = value
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/^[._-]+|[._-]+$/g, '')
+    .replace(/[-_]{2,}/g, '-');
+
+  if (normalized.length < 3 || normalized.length > 80) {
+    return undefined;
+  }
+
+  return normalized;
+}
+
+function isBlockedExternalStateToken(token: string): boolean {
+  return EXTERNAL_STATE_TOKEN_BLOCKLIST.has(token) || /^\d+$/.test(token);
 }
 
 async function addExternalStateToZip(zip: AdmZip, records: ExternalStateRecord[]): Promise<void> {
@@ -607,7 +875,8 @@ function deriveExternalStateRecordsFromArchive(zip: AdmZip): ExternalStateRecord
       return {
         archivePath: entry.entryName,
         homeRelativePath,
-        sourcePath: safeJoin(getHomeDir(), fromArchivePath(homeRelativePath))
+        sourcePath: safeJoin(getHomeDir(), fromArchivePath(homeRelativePath)),
+        discoveredBy: 'archive-fallback'
       };
     });
 }
@@ -926,6 +1195,10 @@ function asRecord(value: unknown): Record<string, unknown> | undefined {
   }
 
   return undefined;
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
 function isNodeError(error: unknown): error is NodeJS.ErrnoException {
