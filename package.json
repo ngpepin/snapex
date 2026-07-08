@@ -1,8 +1,8 @@
 {
   "name": "snapex",
   "displayName": "SnapEx",
-  "description": "Back up and restore installed VS Code extensions, configuration values, and best-effort storage state into separate zip archives.",
-  "version": "0.1.1",
+  "description": "Back up and restore installed VS Code extensions, configuration values, selected external state files, and best-effort storage state into separate zip archives.",
+  "version": "0.1.2",
   "publisher": "local-tools",
   "license": "MIT",
   "engines": {
@@ -72,7 +72,7 @@
         "extensionStateBackup.confirmBeforeRestore": {
           "type": "boolean",
           "default": true,
-          "description": "Ask for confirmation before overwriting an installed extension directory, global storage, workspace storage, or configuration values."
+          "description": "Ask for confirmation before overwriting an installed extension directory, global storage, workspace storage, external state files, or configuration values."
         }
       }
     },
