@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Back up and restore known external state files under the user's home directory.
+- Capture Continue's `~/.continue/config.yaml` as `externalState/home/.continue/config.yaml`.
+- Add smoke-test coverage for Continue config backup and restore.
+
 ## 0.1.0
 
 Initial release.
