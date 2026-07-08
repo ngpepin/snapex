@@ -119,6 +119,7 @@ async function backupAllExtensions(context: vscode.ExtensionContext): Promise<vo
       const runDirectory = await createBackupRunDirectory(baseDirectory, extension, timestamp);
       const archivePath = await createExtensionBackup(context, extension, runDirectory, settings);
       await writeBackupIndex(runDirectory, [archivePath]);
+      await finalizeBackupRunDirectory(runDirectory);
     }
   });
 
@@ -154,18 +155,24 @@ async function backupSelectedExtension(context: vscode.ExtensionContext): Promis
   }
 
   const runDirectory = await createBackupRunDirectory(baseDirectory, picked.extension, new Date());
+  let finalArchivePath: string | undefined;
 
   await withBackupProgress(`Backing up ${picked.extension.id}`, async () => {
     const archivePath = await createExtensionBackup(context, picked.extension, runDirectory, settings);
     await writeBackupIndex(runDirectory, [archivePath]);
+    finalArchivePath = await finalizeBackupRunDirectory(runDirectory);
   });
 
+  if (!finalArchivePath) {
+    return;
+  }
+
   const open = await vscode.window.showInformationMessage(
-    `Backed up ${picked.extension.id} to ${runDirectory}.`,
-    'Open Folder'
+    `Backed up ${picked.extension.id} to ${finalArchivePath}.`,
+    'Open File'
   );
-  if (open === 'Open Folder') {
-    await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(runDirectory));
+  if (open === 'Open File') {
+    await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(finalArchivePath));
   }
 }
 
@@ -183,7 +190,7 @@ async function restoreFromZip(context: vscode.ExtensionContext): Promise<void> {
   }
 
   const zipPath = picked[0].fsPath;
-  const zip = new AdmZip(zipPath);
+  const zip = openRestorableBackupZip(zipPath);
   const manifest = readManifest(zip);
   const settings = getSettings();
 
@@ -296,6 +303,10 @@ async function createBackupRunDirectory(baseDirectory: string, extension: vscode
 
     try {
       await fs.mkdir(candidate, { recursive: false });
+      if (await pathExists(`${candidate}.zip`)) {
+        await removeDirectoryIfExists(candidate);
+        continue;
+      }
       return candidate;
     } catch (error) {
       if (isNodeError(error) && error.code === 'EEXIST') {
@@ -307,6 +318,17 @@ async function createBackupRunDirectory(baseDirectory: string, extension: vscode
   }
 
   throw new Error(`Could not create a unique backup folder for ${extension.id}.`);
+}
+
+async function finalizeBackupRunDirectory(runDirectory: string): Promise<string> {
+  const finalArchivePath = `${runDirectory}.zip`;
+  const zip = new AdmZip();
+
+  zip.addLocalFolder(runDirectory, path.basename(runDirectory));
+  zip.writeZip(finalArchivePath);
+  await removeDirectoryIfExists(runDirectory);
+
+  return finalArchivePath;
 }
 
 async function promptForBackupDirectory(): Promise<string | undefined> {
@@ -685,6 +707,31 @@ async function extractPrefix(zip: AdmZip, archivePrefix: string, targetDirectory
   }
 }
 
+function openRestorableBackupZip(zipPath: string): AdmZip {
+  const selectedZip = new AdmZip(zipPath);
+
+  if (selectedZip.getEntry('manifest.json')) {
+    return selectedZip;
+  }
+
+  for (const entry of selectedZip.getEntries()) {
+    if (entry.isDirectory || !entry.entryName.toLowerCase().endsWith('.zip')) {
+      continue;
+    }
+
+    try {
+      const nestedZip = new AdmZip(entry.getData());
+      if (nestedZip.getEntry('manifest.json')) {
+        return nestedZip;
+      }
+    } catch {
+      // Ignore nested zip-like entries that are not SnapEx extension archives.
+    }
+  }
+
+  throw new Error('This zip does not contain a supported SnapEx extension backup archive.');
+}
+
 function readManifest(zip: AdmZip): BackupManifest {
   const entry = zip.getEntry('manifest.json');
   if (!entry) {
@@ -784,6 +831,15 @@ async function firstExistingPath(paths: string[]): Promise<string | undefined> {
   }
 
   return undefined;
+}
+
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.stat(filePath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function removeDirectoryIfExists(directoryPath: string): Promise<void> {
