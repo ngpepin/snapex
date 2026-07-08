@@ -1,12 +1,13 @@
 # SnapEx User Guide
 
-SnapEx is a local Visual Studio Code extension for backing up and restoring installed VS Code extensions. It creates one final zip package per backed-up extension. Each package contains the extension files, selected VS Code configuration, visible storage folders, and selected external state files when SnapEx can identify them.
+SnapEx is a local Visual Studio Code extension for backing up and restoring installed VS Code extensions. It creates one final zip package per backed-up extension. Each package contains the extension files, selected VS Code configuration, visible storage folders, and discovered external state files when SnapEx can identify them safely.
 
 This guide explains how to install SnapEx, create backups, restore an extension, inspect backup contents, and troubleshoot common issues.
 
 ## Contents
 
 - [What SnapEx backs up](#what-snapex-backs-up)
+- [How external config and state discovery works](#how-external-config-and-state-discovery-works)
 - [What SnapEx cannot fully back up](#what-snapex-cannot-fully-back-up)
 - [Install or update SnapEx](#install-or-update-snapex)
 - [Open SnapEx in VS Code](#open-snapex-in-vs-code)
@@ -41,9 +42,53 @@ The nested extension archive can include:
 - `configuration/configuration.json` with explicitly set VS Code settings contributed by that extension.
 - `globalStorage/` with the extension's per-extension global storage folder, when present.
 - `workspaceStorage/current/` with storage for the currently open workspace, when present.
-- `externalState/home/` with selected extension-owned files under your home directory, when present.
-- `metadata/external-state.json` with restore metadata for captured external state files.
+- `externalState/home/` with discovered extension-owned files under your home directory, when present.
+- `metadata/external-state.json` with restore metadata and discovery hints for captured external state files.
 - `metadata/extension-file-modes.json` with file permission metadata for restored extension files, where supported.
+
+## How external config and state discovery works
+
+VS Code extensions do not declare every external config or state file in a universal manifest field. SnapEx therefore uses a generalized, best-effort discovery process instead of a one-extension-only rule.
+
+For each extension, SnapEx derives safe identity tokens from information such as:
+
+- extension id, for example `Continue.continue`
+- manifest `name`, for example `continue`
+- manifest `displayName`
+- manifest `publisher`
+- repository name, if the manifest declares one
+- contributed setting prefixes, for example `continue.*` or `genericTool.*`
+
+SnapEx then checks common user-level config/state locations under your home directory, such as:
+
+```text
+~/.<token>/
+~/.<token>.json
+~/.<token>.yaml
+~/.config/<token>/
+~/.config/<token>.json
+~/.config/<token>.yaml
+~/.local/share/<token>/
+~/Library/Application Support/<token>/
+~/Library/Preferences/<token>/
+~/AppData/Roaming/<token>/
+~/AppData/Local/<token>/
+```
+
+It also checks publisher/name combinations in common Linux, macOS, and Windows locations.
+
+Example: Continue is discovered through the generic `continue` token, so `~/.continue/config.yaml` is still captured, but the implementation is no longer limited to Continue. A different extension with manifest name `generic-tool` could have files captured from `~/.generic-tool/` or `~/.config/generic-tool/` when those paths exist.
+
+To keep backups safer and smaller, SnapEx:
+
+- skips common cache, log, temp, build, and dependency folders
+- ignores symlinks during external-state discovery
+- limits the number of external files captured per extension
+- limits individual file size
+- limits total external-state size per extension
+- records a `discoveredBy` hint in `metadata/external-state.json`
+
+Because this is heuristic, you should inspect important backups at least once before relying on them for a migration or rollback.
 
 ## What SnapEx cannot fully back up
 
@@ -57,7 +102,7 @@ SnapEx cannot reliably back up or restore:
 - Private in-memory state.
 - Every `globalState` or `workspaceState` value if the extension stores it only in VS Code's shared internal databases.
 - Workspace storage for workspaces that are not currently open during the backup.
-- Arbitrary files referenced by an extension, such as model files, certificates, prompts, rule files, server logs, or custom working directories outside the selected captured paths.
+- Arbitrary files referenced by an extension, such as model files, certificates, prompts, rule files, server logs, or custom working directories outside the discovered captured paths.
 
 Treat every backup as important but not as a guaranteed complete clone of all extension behavior. After restoring, you may still need to sign in again or re-enter secrets.
 
@@ -102,7 +147,7 @@ code --list-extensions --show-versions | grep '^local-tools.snapex@'
 You should see output similar to:
 
 ```text
-local-tools.snapex@0.1.4
+local-tools.snapex@0.1.5
 ```
 
 The exact version may be newer than this guide if SnapEx has been updated.
@@ -256,7 +301,19 @@ metadata/extension-file-modes.json
 
 The exact contents depend on what exists on your machine and which SnapEx settings are enabled.
 
-### Example 2: extension with only VS Code settings
+### Example 2: generic extension with external files
+
+An extension named `generic-tool` might have files captured from:
+
+```text
+externalState/home/.generic-tool/config.json
+externalState/home/.generic-tool/state/session.json
+externalState/home/.config/generic-tool/settings.yaml
+```
+
+These paths would be discovered from the extension manifest name, repository name, or contributed setting prefixes. Cache-like folders such as `externalState/home/.generic-tool/cache/` are intentionally skipped.
+
+### Example 3: extension with only VS Code settings
 
 Some extensions do not have obvious external files or storage folders. Their nested archive may contain only:
 
@@ -269,7 +326,7 @@ metadata/extension-file-modes.json
 
 That can still be a valid and useful backup.
 
-### Example 3: extension with no explicitly configured settings
+### Example 4: extension with no explicitly configured settings
 
 If you never changed an extension's settings, `configuration/configuration.json` may be empty or may not contain many values. SnapEx backs up explicitly set values; it does not need to copy default values because the extension already contributes those defaults.
 
@@ -309,6 +366,14 @@ If the file was captured, you should see an entry like:
 ```text
 externalState/home/.continue/config.yaml
 ```
+
+### Inspect external-state discovery metadata
+
+```bash
+unzip -p /tmp/snapex-check/vscode-extension-backup-Continue.continue-2.0.0_202607080405PM/Continue.continue-2.0.0.zip metadata/external-state.json
+```
+
+Each captured file includes its archive path, home-relative restore path, source path, file mode when available, and a `discoveredBy` hint.
 
 ### Read the backup manifest
 
@@ -459,7 +524,9 @@ This discards local-only commits and resets your checkout to `origin/main` befor
 
 ### A backup zip was created, but an expected config file is missing
 
-Check whether that file is one SnapEx can currently identify and capture.
+Inspect `metadata/external-state.json` in the nested extension zip. If the file is not listed, SnapEx did not discover it.
+
+SnapEx looks for likely extension-owned files under common locations such as `~/.<token>/`, `~/.config/<token>/`, `~/.local/share/<token>/`, macOS Application Support/Preferences, and Windows AppData paths. Some extensions store configuration in locations that are not declared in their VS Code manifest and do not match those conventions.
 
 For Continue, check for:
 
@@ -478,8 +545,6 @@ Then inspect the nested zip:
 ```bash
 unzip -l Continue.continue-2.0.0.zip
 ```
-
-Some extensions store configuration in locations that are not declared in their VS Code manifest. SnapEx cannot infer every custom path with complete reliability.
 
 ### Restore fails on Windows because files are locked
 
@@ -503,12 +568,18 @@ If you want the latest Marketplace version instead, install or update that exten
 npm test
 ```
 
-This compiles the TypeScript extension and runs the regression suite.
+This compiles the TypeScript extension and runs the regression suite, including the generalized external-state discovery test.
 
 ### Run the regression suite directly
 
 ```bash
 npm run test:regression
+```
+
+### Run only the external-discovery regression
+
+```bash
+npm run test:external-discovery
 ```
 
 ### Run the older smoke test
@@ -526,7 +597,7 @@ npm run package
 This creates a file named like:
 
 ```text
-snapex-0.1.4.vsix
+snapex-0.1.5.vsix
 ```
 
 The exact version follows the current `package.json` version.
@@ -534,7 +605,7 @@ The exact version follows the current `package.json` version.
 ### Install the packaged VSIX manually
 
 ```bash
-code --install-extension snapex-0.1.4.vsix --force
+code --install-extension snapex-0.1.5.vsix --force
 ```
 
 Reload VS Code after installing.
