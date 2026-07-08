@@ -13,34 +13,34 @@
   ],
   "activationEvents": [
     "onView:snapex.actions",
-    "onCommand:snapex.backupAll",
-    "onCommand:snapex.backupSelected",
-    "onCommand:snapex.restoreFromZip",
-    "onCommand:snapex.openBackupFolder"
+    "onCommand:extensionStateBackup.backupAll",
+    "onCommand:extensionStateBackup.backupSelected",
+    "onCommand:extensionStateBackup.restoreFromZip",
+    "onCommand:extensionStateBackup.openBackupFolder"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "snapex.backupAll",
+        "command": "extensionStateBackup.backupAll",
         "title": "Backup All Extensions",
         "category": "SnapEx",
         "icon": "$(archive)"
       },
       {
-        "command": "snapex.backupSelected",
+        "command": "extensionStateBackup.backupSelected",
         "title": "Backup Selected Extension",
         "category": "SnapEx",
         "icon": "$(extensions)"
       },
       {
-        "command": "snapex.restoreFromZip",
+        "command": "extensionStateBackup.restoreFromZip",
         "title": "Restore Extension from Zip",
         "category": "SnapEx",
         "icon": "$(history)"
       },
       {
-        "command": "snapex.openBackupFolder",
+        "command": "extensionStateBackup.openBackupFolder",
         "title": "Open Backup Folder",
         "category": "SnapEx",
         "icon": "$(folder-opened)"
@@ -49,27 +49,27 @@
     "configuration": {
       "title": "SnapEx",
       "properties": {
-        "snapex.defaultBackupLocation": {
+        "extensionStateBackup.defaultBackupLocation": {
           "type": "string",
           "default": "",
           "description": "Optional absolute folder path where extension backup runs are written. When empty, you will be prompted each time."
         },
-        "snapex.includeBuiltIn": {
+        "extensionStateBackup.includeBuiltIn": {
           "type": "boolean",
           "default": false,
           "description": "Include built-in VS Code extensions in backup runs. Usually leave this disabled because built-ins are restored by VS Code itself."
         },
-        "snapex.includeExtensionFiles": {
+        "extensionStateBackup.includeExtensionFiles": {
           "type": "boolean",
           "default": true,
           "description": "Include each extension's installed files in its backup archive. Disable this only when you want configuration and storage state snapshots."
         },
-        "snapex.includeCurrentWorkspaceStorage": {
+        "extensionStateBackup.includeCurrentWorkspaceStorage": {
           "type": "boolean",
           "default": true,
           "description": "Include the current workspace storage folder for each extension when available. Other workspaces are not scanned."
         },
-        "snapex.confirmBeforeRestore": {
+        "extensionStateBackup.confirmBeforeRestore": {
           "type": "boolean",
           "default": true,
           "description": "Ask for confirmation before overwriting an installed extension directory, global storage, workspace storage, or configuration values."
@@ -92,7 +92,13 @@
           "name": "Actions"
         }
       ]
-    }
+    },
+    "viewsWelcome": [
+      {
+        "view": "snapex.actions",
+        "contents": "[Backup All Extensions](command:extensionStateBackup.backupAll)\n[Backup Selected Extension](command:extensionStateBackup.backupSelected)\n[Restore Extension from Zip](command:extensionStateBackup.restoreFromZip)\n[Open Backup Folder](command:extensionStateBackup.openBackupFolder)"
+      }
+    ]
   },
   "scripts": {
     "compile": "tsc -p ./",
