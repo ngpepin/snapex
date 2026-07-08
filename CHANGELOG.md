@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3
+
+- Write each extension backup into an extension-specific folder named `vscode-extension-backup-<extension-name-and-version>_YYYYMMDDHHMMAM/PM`.
+- Generate backup folder timestamps from the machine's local time instead of ISO UTC strings.
+- Add smoke-test coverage for the new backup folder naming convention.
+
 ## 0.1.2
 
 - Back up and restore known external state files under the user's home directory.
