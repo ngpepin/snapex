@@ -99,6 +99,43 @@ npm run compile
 
 Press `F5` in VS Code to launch an Extension Development Host.
 
+## Regression testing
+
+Run the full regression suite with:
+
+```bash
+npm test
+```
+
+`npm test` compiles the TypeScript extension and then runs `test/regression-test.js`, which uses a mocked VS Code extension host plus temporary filesystem fixtures. It does not need a real VS Code window.
+
+The regression suite currently verifies that SnapEx:
+
+1. Registers the backup, restore, selected-backup, and open-folder commands.
+2. Excludes built-in extensions from default backups.
+3. Creates the final timestamped `vscode-extension-backup-<extension-and-version>_YYYYMMDDHHMMAM/PM.zip` package.
+4. Deletes the temporary uncompressed staging folder after writing the final package.
+5. Writes `backup-index.json` and the nested per-extension zip.
+6. Captures installed extension files, contributed VS Code settings, global storage, current-workspace storage, Continue's `~/.continue/config.yaml`, external-state metadata, and file-mode metadata.
+7. Restores from both the final outer package and the nested extension archive directly.
+8. Replays global, workspace, and workspace-folder configuration values.
+9. Leaves files, storage, external state, and settings untouched when restore confirmation is cancelled.
+10. Rejects malicious archive entries that try to write outside the target restore directory.
+11. Restores external state from older-compatible archives that contain `externalState/home/` files but no `metadata/external-state.json`.
+12. Reveals either the configured backup folder or the fallback SnapEx storage backup folder.
+
+You can also run the suite explicitly with:
+
+```bash
+npm run test:regression
+```
+
+The older narrow smoke test remains available for comparison:
+
+```bash
+npm run test:smoke
+```
+
 ## Restore behavior
 
 When restoring a backup zip, the extension:
