@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4
+
+- Package each extension backup folder into a final `.zip` file and delete the uncompressed folder after packaging.
+- Preserve the timestamped backup folder inside the final package, containing `backup-index.json` and the nested extension archive.
+- Allow restore to accept either the final backup package or the nested extension archive directly.
+- Add smoke-test coverage for final package creation, folder deletion, and restore from the final package.
+
 ## 0.1.3
 
 - Write each extension backup into an extension-specific folder named `vscode-extension-backup-<extension-name-and-version>_YYYYMMDDHHMMAM/PM`.
