@@ -52,11 +52,11 @@ From this project folder, run:
 bash update-extension.sh
 ```
 
-The script fetches the latest `origin/main` and tags, fast-forwards the local branch, reports the current `package.json` version against the latest semver release/tag it can see, installs npm dependencies, runs the smoke test, packages the VSIX for the current version, uninstalls older SnapEx extension ids, and reinstalls the newly packaged VSIX with `--force`.
+The script fetches the latest `origin/main` and tags, fast-forwards the local branch, reports the current `package.json` version against the latest semver release/tag it can see, installs npm dependencies, runs the smoke test, packages the VSIX for the current version, uninstalls older SnapEx extension ids, reinstalls the newly packaged VSIX with `--force`, and verifies that VS Code lists the installed SnapEx extension.
 
 After it finishes, reload VS Code.
 
-To verify that VS Code sees the extension, run the final verification command printed by the script, or run:
+The script runs this verification automatically, but you can re-run it manually if needed:
 
 ```bash
 code --list-extensions --show-versions | grep '^local-tools.snapex@'
