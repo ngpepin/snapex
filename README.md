@@ -11,6 +11,22 @@ Open the SnapEx Activity Bar icon (`snapex-icon.png`), or open the Command Palet
 - `SnapEx: Restore Extension from Zip`
 - `SnapEx: Open Backup Folder`
 
+## Backup folder names
+
+Each extension backup is written into its own folder using this format:
+
+```text
+vscode-extension-backup-<extension-name-and-version>_YYYYMMDDHHMMAM/PM
+```
+
+The timestamp is generated from the local time of the machine running VS Code. For example, a Continue `2.0.0` backup made at 4:05 PM on July 8, 2026 would use a folder name like:
+
+```text
+vscode-extension-backup-Continue.continue-2.0.0_202607080405PM
+```
+
+The `.zip` archive inside that folder keeps the shorter extension archive name, such as `Continue.continue-2.0.0.zip`.
+
 ## What each zip contains
 
 Each extension backup is written as a separate `.zip` file and contains:
