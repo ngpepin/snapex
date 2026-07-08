@@ -1,6 +1,6 @@
 # SnapEx
 
-SnapEx is a local VS Code extension that creates one final zip package per installed extension. Each package contains a timestamped backup folder with the extension archive plus a best-effort snapshot of that extension's configuration, selected external state files, and storage folders.
+SnapEx is a local VS Code extension that creates one final zip package per installed extension. Each package contains a timestamped backup folder with the extension archive plus a best-effort snapshot of that extension's configuration, discovered external state files, and storage folders.
 
 ## User guide
 
@@ -40,11 +40,44 @@ The nested extension archive contains:
 - `configuration/configuration.json` with explicitly set global, workspace, and workspace-folder values for configuration keys contributed by that extension.
 - `globalStorage/` with the extension's per-extension global storage folder, when present.
 - `workspaceStorage/current/` with the extension's storage folder for the currently open workspace, when present.
-- `externalState/home/` with selected extension-owned config files from the user's home directory, when present. For Continue, this includes `~/.continue/config.yaml`.
-- `metadata/external-state.json` with restore metadata for files captured under `externalState/home/`.
+- `externalState/home/` with discovered extension-owned config/state files from the user's home directory, when present.
+- `metadata/external-state.json` with restore metadata and discovery hints for files captured under `externalState/home/`.
 - `metadata/extension-file-modes.json` with executable/file mode metadata so restored extension files can keep Unix permissions when possible.
 
 The restore command accepts either the final `vscode-extension-backup-...zip` package or the nested extension archive directly.
+
+## External config and state discovery
+
+VS Code extension manifests do not expose a universal list of every external config or state file an extension may create. SnapEx therefore uses a conservative, generalized discovery layer instead of a single Continue-specific path.
+
+During backup, SnapEx builds identity tokens from each extension's:
+
+- extension id
+- manifest `name`
+- manifest `displayName`
+- manifest `publisher`
+- repository basename, when declared
+- contributed configuration key prefixes, such as `continue.*` or `genericTool.*`
+
+It then checks common per-user config/state locations under the home directory, including:
+
+```text
+~/.<token>/
+~/.<token>.json
+~/.<token>.yaml
+~/.config/<token>/
+~/.config/<token>.json
+~/.config/<token>.yaml
+~/.local/share/<token>/
+~/Library/Application Support/<token>/
+~/Library/Preferences/<token>/
+~/AppData/Roaming/<token>/
+~/AppData/Local/<token>/
+```
+
+Publisher/name combinations are also checked in common XDG, macOS, and Windows locations. For example, Continue is now captured through the generic `continue` token, so `~/.continue/config.yaml` is still included without a dedicated hard-coded Continue-only function.
+
+To avoid sweeping too broadly, SnapEx skips common cache/log/build folders, ignores symlinks, and applies per-file, per-extension file-count, and total-size limits. The metadata file records a `discoveredBy` hint for each external file so backups can be inspected later.
 
 ## What cannot be fully backed up
 
@@ -54,9 +87,9 @@ VS Code does not expose every private state location of other extensions through
 - Authentication sessions managed by VS Code or by the operating system.
 - Every private Memento/globalState record if an extension stores it in VS Code's shared internal state database instead of in its own `globalStorage` folder.
 - Workspace storage for workspaces that are not open during the backup run.
-- Arbitrary files referenced from an extension's config, such as custom model files, certificates, rule files, prompt files, or MCP server working directories outside the selected external-state paths.
+- Arbitrary files referenced from an extension's config, such as custom model files, certificates, rule files, prompt files, or MCP server working directories outside the discovered external-state paths.
 
-The archive is still useful for restoring the installed extension files, contributed user/workspace settings, storage folders that are visible to the extension host, and known external config files such as Continue's `~/.continue/config.yaml`.
+The archive is still useful for restoring the installed extension files, contributed user/workspace settings, storage folders that are visible to the extension host, and discovered external config/state files such as Continue's `~/.continue/config.yaml`.
 
 ## Settings
 
@@ -111,7 +144,7 @@ Run the full regression suite with:
 npm test
 ```
 
-`npm test` compiles the TypeScript extension and then runs `test/regression-test.js`, which uses a mocked VS Code extension host plus temporary filesystem fixtures. It does not need a real VS Code window.
+`npm test` compiles the TypeScript extension, runs `test/regression-test.js`, and then runs `test/external-discovery-test.js`. The tests use mocked VS Code extension hosts plus temporary filesystem fixtures. They do not need a real VS Code window.
 
 The regression suite currently verifies that SnapEx:
 
@@ -120,18 +153,26 @@ The regression suite currently verifies that SnapEx:
 3. Creates the final timestamped `vscode-extension-backup-<extension-and-version>_YYYYMMDDHHMMAM/PM.zip` package.
 4. Deletes the temporary uncompressed staging folder after writing the final package.
 5. Writes `backup-index.json` and the nested per-extension zip.
-6. Captures installed extension files, contributed VS Code settings, global storage, current-workspace storage, Continue's `~/.continue/config.yaml`, external-state metadata, and file-mode metadata.
+6. Captures installed extension files, contributed VS Code settings, global storage, current-workspace storage, external state, external-state metadata, and file-mode metadata.
 7. Restores from both the final outer package and the nested extension archive directly.
 8. Replays global, workspace, and workspace-folder configuration values.
 9. Leaves files, storage, external state, and settings untouched when restore confirmation is cancelled.
 10. Rejects malicious archive entries that try to write outside the target restore directory.
 11. Restores external state from older-compatible archives that contain `externalState/home/` files but no `metadata/external-state.json`.
 12. Reveals either the configured backup folder or the fallback SnapEx storage backup folder.
+13. Discovers external config/state files for a non-Continue extension through manifest and configuration-key hints.
+14. Skips cache folders during generalized external-state discovery.
 
 You can also run the suite explicitly with:
 
 ```bash
 npm run test:regression
+```
+
+Run only the generalized external-state discovery test with:
+
+```bash
+npm run test:external-discovery
 ```
 
 The older narrow smoke test remains available for comparison:
@@ -150,7 +191,7 @@ When restoring a backup zip, the extension:
 4. Extracts the backed-up `extension/` files into the extension install folder.
 5. Restores captured `globalStorage/` and current-workspace storage folders.
 6. Restores captured contributed settings.
-7. Restores captured external state files under the current user's home directory, such as `~/.continue/config.yaml`.
+7. Restores captured external state files under the current user's home directory, such as `~/.continue/config.yaml` when discovered and captured.
 8. Prompts you to reload the VS Code window.
 
 Restoring an active extension can fail on locked files, especially on Windows. Closing extra VS Code windows and retrying usually helps.
