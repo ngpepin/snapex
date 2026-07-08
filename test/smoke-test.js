@@ -131,7 +131,15 @@ async function main() {
   assert(registered.has('extensionStateBackup.restoreFromZip'));
 
   await registered.get('extensionStateBackup.backupAll')();
-  const runDir = path.join(backupRoot, (await fs.readdir(backupRoot))[0]);
+  const backupFolderNames = await fs.readdir(backupRoot);
+  assert.strictEqual(backupFolderNames.length, 1);
+  assert.match(
+    backupFolderNames[0],
+    /^vscode-extension-backup-Continue\.continue-2\.0\.0_\d{12}(AM|PM)$/,
+    `Unexpected backup folder name: ${backupFolderNames[0]}`
+  );
+
+  const runDir = path.join(backupRoot, backupFolderNames[0]);
   const archivePath = path.join(runDir, 'Continue.continue-2.0.0.zip');
   const zip = new AdmZip(archivePath);
   const entryNames = zip.getEntries().map((entry) => entry.entryName);
@@ -174,7 +182,7 @@ async function main() {
   assert(updatedSettings.some((entry) => entry.key === 'continue.enableConsole' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.WorkspaceFolder));
   assert(updatedSettings.some((entry) => entry.key === 'continue.enableQuickActions' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.Global));
 
-  console.log(`Smoke test passed: ${path.basename(archivePath)} contained ${entryNames.length} entries and restore replayed ${updatedSettings.length} settings.`);
+  console.log(`Smoke test passed: ${path.basename(archivePath)} in ${path.basename(runDir)} contained ${entryNames.length} entries and restore replayed ${updatedSettings.length} settings.`);
 }
 
 main().catch((error) => {
