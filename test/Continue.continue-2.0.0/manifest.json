@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-07-08T14:43:05.478Z",
+  "source": {
+    "appName": "Visual Studio Code",
+    "appRoot": "/usr/share/code/resources/app",
+    "uiKind": "Desktop",
+    "platform": "linux",
+    "arch": "x64",
+    "homeDir": "/home/npepin"
+  },
+  "extension": {
+    "id": "Continue.continue",
+    "directoryName": "continue.continue-2.0.0-linux-x64",
+    "version": "2.0.0",
+    "displayName": "Continue - open-source AI code agent",
+    "publisher": "Continue",
+    "name": "continue",
+    "isBuiltin": false,
+    "extensionKind": [
+      "ui",
+      "workspace"
+    ],
+    "extensionPath": "/home/npepin/.vscode/extensions/continue.continue-2.0.0-linux-x64"
+  },
+  "contents": {
+    "extensionFiles": true,
+    "configuration": true,
+    "globalStorage": true,
+    "currentWorkspaceStorage": false
+  },
+  "notes": [
+    "This backup includes installed extension files, contributed VS Code configuration values, per-extension globalStorage, and current-workspace storage when available.",
+    "VS Code does not expose another extension's SecretStorage, OS keychain entries, authentication sessions, or all private Memento records through the public API, so those items are not included.",
+    "Workspace storage is limited to the workspace open when the backup command ran."
+  ]
+}

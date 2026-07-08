@@ -1,0 +1,26 @@
+{
+  "contributedKeys": [
+    "continue.disableQuickFix",
+    "continue.enableConsole",
+    "continue.enableNextEdit",
+    "continue.enableQuickActions",
+    "continue.enableTabAutocomplete",
+    "continue.pauseCodebaseIndexOnStart",
+    "continue.pauseTabAutocompleteOnBattery",
+    "continue.remoteConfigServerUrl",
+    "continue.remoteConfigSyncPeriod",
+    "continue.showInlineTip",
+    "continue.telemetryEnabled",
+    "continue.userToken"
+  ],
+  "records": [
+    {
+      "key": "continue.enableConsole",
+      "globalValue": true
+    },
+    {
+      "key": "continue.enableQuickActions",
+      "globalValue": true
+    }
+  ]
+}

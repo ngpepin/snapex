@@ -4,3 +4,4 @@ out/
 .DS_Store
 .vscode-test/
 package-lock.json
+test/Continue.continue-2.0.0/extension

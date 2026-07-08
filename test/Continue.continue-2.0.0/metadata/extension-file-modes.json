@@ -1,0 +1,1586 @@
+[
+  {
+    "relativePath": ".continueignore",
+    "mode": 420
+  },
+  {
+    "relativePath": ".vsixmanifest",
+    "mode": 436
+  },
+  {
+    "relativePath": "LICENSE.txt",
+    "mode": 420
+  },
+  {
+    "relativePath": "README.md",
+    "mode": 436
+  },
+  {
+    "relativePath": "bin/napi-v3/linux/arm64/libonnxruntime.so.1.14.0",
+    "mode": 420
+  },
+  {
+    "relativePath": "bin/napi-v3/linux/arm64/onnxruntime_binding.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "bin/napi-v3/linux/x64/libonnxruntime.so.1.14.0",
+    "mode": 420
+  },
+  {
+    "relativePath": "bin/napi-v3/linux/x64/onnxruntime_binding.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "config-yaml-schema.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "config_schema.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "continue_rc_schema.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "continue_tutorial.py",
+    "mode": 420
+  },
+  {
+    "relativePath": "entitlements.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/XCircleIcon.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/_basePickBy.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/_baseUniq.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/arc.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/architectureDiagram-2XIMDMQ5.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/blockDiagram-WCTKOSBZ.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/c4Diagram-IC4MRINW.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/channel.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/chunk-4BX2VUAB.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/chunk-55IACEB6.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/chunk-FMBD7UC4.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/chunk-JSJVCQXG.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/chunk-KX2RTZJC.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/chunk-NQ4KR5QH.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/chunk-QZHKN3VN.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/chunk-WL4C6EOR.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/classDiagram-VBA2DB6C.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/classDiagram-v2-RAHNMMFH.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/clone.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/cose-bilkent-S5V4N54A.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/cytoscape.esm.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/dagre-KLK3FWXG.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/defaultLocale.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/diagram-E7M64L7V.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/diagram-IFDJBPK2.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/diagram-P4PSJMXO.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/erDiagram-INFDFZHY.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/flowDiagram-PKNHOUZH.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/ganttDiagram-A5KZAMGK.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/gitGraphDiagram-K3NZZRJ6.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/graph.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/handlebars.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/index.css",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/index.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/indexConsole.css",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/indexConsole.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/infoDiagram-LFFYTUFH.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/init.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/ishikawaDiagram-PHBUUO56.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/journeyDiagram-4ABVD52K.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/kanban-definition-K7BYSVSG.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/layout.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/linear.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/mindmap-definition-YRQLILUH.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/ordinal.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/pieDiagram-SKSYHLDU.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/quadrantDiagram-337W2JSQ.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/requirementDiagram-Z7DCOOCP.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/sankeyDiagram-WA2Y5GQK.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/sequenceDiagram-2WXFIKYE.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/stateDiagram-RAJIS63D.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/stateDiagram-v2-FVOUBMTO.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/timeline-definition-YZTLITO2.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/treemap-KZPCXAKY.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/vennDiagram-LZ73GAT5.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/assets/xychartDiagram-JWTSCODW.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/fonts/Inter/InterDisplay-Light.woff2",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/fonts/Inter/LICENSE.txt",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/fonts/JetBrainsMono/AUTHORS.txt",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/fonts/JetBrainsMono/JetBrainsMono-Light.woff2",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/fonts/JetBrainsMono/OFL.txt",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/index.html",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/indexConsole.html",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/jetbrains_editorInset_index.html",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/jetbrains_index.html",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/TetrateAgentRouterService.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/WatsonX.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/allenai.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/anthropic.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/ask-sage.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/azure.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/cerebras.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/clawrouter.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/cohere.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/cometapi.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/deepseek.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/docker.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/fireworks.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/function-network.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/gemini.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/groq.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/hunyuan.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/ibm.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/inception.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/lemonade.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/llamacpp.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/llamafile.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/lmstudio.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/meta.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/mimo.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/mistral.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/moonshot.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/ncompass.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/nebius.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/novita.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/nvidia.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/ollama.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/openai.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/openrouter.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/ovhcloud.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/qwen.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/replicate.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/sambanova.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/scaleway.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/siliconflow.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/together.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/venice.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/vertexai.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/wizardlm.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/xAI.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/logos/zai.svg",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/ASPVBnet.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Batch File.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Clojure.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Dockerfile.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Groovy.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Handlebars.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/JSON.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Jade.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/JavaScript.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/MagicPython.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/MagicRegExp.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Makefile.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Objective-C.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Perl 6.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Perl.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Platform.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/PowershellSyntax.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/R.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Regular Expressions (JavaScript).tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Ruby.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/SQL.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/Shell-Unix-Bash.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/TypeScript.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/TypeScriptReact.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/c++.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/c.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/coffeescript.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/cshtml.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/css.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/diff.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/fsharp.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/git-commit.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/git-rebase.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/go.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/html.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/java.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/less.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/lua.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/markdown.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/php.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/properties.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/rust.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/scss.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/shaderlab.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/swift.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/xml.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/xsl.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "gui/textmate-syntaxes/yaml.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "media/icon.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "media/move-chat-panel-right.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "media/move-to-right-sidebar.gif",
+    "mode": 420
+  },
+  {
+    "relativePath": "media/prompt.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "media/readme.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "media/sidebar-icon.png",
+    "mode": 420
+  },
+  {
+    "relativePath": "models/README.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "models/all-MiniLM-L6-v2/README.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "models/all-MiniLM-L6-v2/config.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "models/all-MiniLM-L6-v2/onnx/model_quantized.onnx",
+    "mode": 420
+  },
+  {
+    "relativePath": "models/all-MiniLM-L6-v2/special_tokens_map.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "models/all-MiniLM-L6-v2/tokenizer.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "models/all-MiniLM-L6-v2/tokenizer_config.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "models/all-MiniLM-L6-v2/vocab.txt",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/Release/node_sqlite3.node",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/build/Release/node_sqlite3.node",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/crypt32-ia32-ICQ243Y3.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/crypt32-x64-DGNGT7PC.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/extension.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/llamaTokenizer.mjs",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/llamaTokenizerWorkerPool.mjs",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@lancedb/vectordb-linux-x64-gnu/README.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@lancedb/vectordb-linux-x64-gnu/index.node",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/node_modules/@lancedb/vectordb-linux-x64-gnu/package.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/.vscode/launch.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/LICENSE",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/README.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/SECURITY.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/bin/rg",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/build/pipeline.yml",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/jsconfig.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/lib/download.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/lib/index.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/lib/index.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/lib/postinstall.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/@vscode/ripgrep/package.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/HISTORY.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/LICENSE",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/README.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/worker.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/worker.js.map",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/worker.min.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/worker.min.js.map",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/workerpool.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/workerpool.js.map",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/workerpool.min.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/workerpool.min.js.LICENSE.txt",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/dist/workerpool.min.js.map",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/package.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/Pool.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/Promise.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/WorkerHandler.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/debug-port-allocator.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/environment.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/generated/embeddedWorker.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/header.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/index.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/requireFoolWebpack.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/transfer.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/types.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/validateOptions.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/src/worker.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/Pool.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/Promise.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/WorkerHandler.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/debug-port-allocator.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/environment.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/generated/embeddedWorker.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/index.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/test.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/transfer.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/types.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/validateOptions.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/node_modules/workerpool/types/worker.d.ts",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/onnxruntime_binding-4LK5T42I.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/onnxruntime_binding-I6FPYYOQ.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/onnxruntime_binding-L2PGCXTQ.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/onnxruntime_binding-NH5JCQKK.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/onnxruntime_binding-OTOMEMLG.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/onnxruntime_binding-ZTPWXQRS.node",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/start_ollama.sh",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tiktokenWorkerPool.mjs",
+    "mode": 420
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-bash.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-c.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-c_sharp.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-cpp.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-css.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-dart.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-elisp.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-elixir.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-elm.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-embedded_template.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-go.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-html.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-java.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-javascript.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-json.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-kotlin.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-lua.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-objc.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-ocaml.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-php.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-python.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-ql.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-rescript.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-ruby.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-rust.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-scala.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-solidity.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-swift.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-systemrdl.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-tlaplus.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-toml.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-tsx.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-typescript.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-vue.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-yaml.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter-wasms/tree-sitter-zig.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/tree-sitter.wasm",
+    "mode": 493
+  },
+  {
+    "relativePath": "out/xhr-sync-worker.js",
+    "mode": 420
+  },
+  {
+    "relativePath": "package.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "rules.md",
+    "mode": 420
+  },
+  {
+    "relativePath": "settings.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-c-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-c_sharp-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-cpp-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-elisp-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-elixir-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-elm-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-go-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-java-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-javascript-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-ocaml-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-php-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-python-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-ql-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-ruby-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-rust-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tag-qry/tree-sitter-typescript-tags.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/ASPVBnet.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Batch File.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Clojure.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Dockerfile.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Groovy.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Handlebars.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/JSON.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Jade.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/JavaScript.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/MagicPython.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/MagicRegExp.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Makefile.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Objective-C.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Perl 6.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Perl.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Platform.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/PowershellSyntax.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/R.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Regular Expressions (JavaScript).tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Ruby.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/SQL.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/Shell-Unix-Bash.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/TypeScript.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/TypeScriptReact.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/c++.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/c.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/coffeescript.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/cshtml.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/css.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/diff.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/fsharp.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/git-commit.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/git-rebase.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/go.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/html.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/java.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/less.tmLanguage.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/lua.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/markdown.tmLanguage",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/php.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/properties.plist",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/rust.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/scss.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/shaderlab.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/swift.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/xml.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/xsl.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "textmate-syntaxes/yaml.json",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/c.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/c_sharp.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/cpp.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/elisp.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/elixir.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/go.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/java.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/javascript.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/ocaml.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/php.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/python.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/ql.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/ruby.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/rust.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/code-snippet-queries/typescript.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/import-queries/cpp.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/import-queries/java.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/import-queries/python.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/import-queries/typescript.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/cpp/function_definition.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/go/function_declaration.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/java/method_declaration.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/php/class_declaration.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/php/function_definition.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/php/method_declaration.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/python/class_definition.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/python/function_definition.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/typescript/arrow_function.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/typescript/class_declaration.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/typescript/function_declaration.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/typescript/generator_function_declaration.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/root-path-context-queries/typescript/method_definition.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/static-context-queries/hole-queries/typescript.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/static-context-queries/relevant-headers-queries/typescript-get-toplevel-headers.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/static-context-queries/relevant-types-queries/typescript-extract-identifiers.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tree-sitter/static-context-queries/relevant-types-queries/typescript-find-typedecl-given-typeidentifier.scm",
+    "mode": 420
+  },
+  {
+    "relativePath": "tsconfig.e2e.json",
+    "mode": 420
+  }
+]
