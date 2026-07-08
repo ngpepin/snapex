@@ -70,7 +70,7 @@ From this project folder, run:
 bash update-extension.sh
 ```
 
-The script fetches the latest `origin/main` and tags, fast-forwards the local branch, reports the current `package.json` version against the latest semver release/tag it can see, installs npm dependencies, runs the smoke test, packages the VSIX for the current version, uninstalls older SnapEx extension ids, reinstalls the newly packaged VSIX with `--force`, and verifies that VS Code lists the installed SnapEx extension.
+The script fetches the latest `origin/main` and tags, fast-forwards the local branch, reports the current `package.json` version against the latest semver release/tag it can see, installs npm dependencies, runs the regression suite, packages the VSIX for the current version, uninstalls older SnapEx extension ids, reinstalls the newly packaged VSIX with `--force`, and verifies that VS Code lists the installed SnapEx extension.
 
 After it finishes, reload VS Code.
 
