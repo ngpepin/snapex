@@ -1,0 +1,87 @@
+{
+  "name": "extension-state-backup",
+  "displayName": "Extension State Backup",
+  "description": "Back up installed VS Code extensions, configuration values, and best-effort storage state into separate zip archives, then restore a chosen archive later.",
+  "version": "0.1.0",
+  "publisher": "local-tools",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.92.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extensionStateBackup.backupAll",
+    "onCommand:extensionStateBackup.backupSelected",
+    "onCommand:extensionStateBackup.restoreFromZip",
+    "onCommand:extensionStateBackup.openBackupFolder"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extensionStateBackup.backupAll",
+        "title": "Extension State Backup: Backup All Extensions"
+      },
+      {
+        "command": "extensionStateBackup.backupSelected",
+        "title": "Extension State Backup: Backup Selected Extension"
+      },
+      {
+        "command": "extensionStateBackup.restoreFromZip",
+        "title": "Extension State Backup: Restore Extension from Zip"
+      },
+      {
+        "command": "extensionStateBackup.openBackupFolder",
+        "title": "Extension State Backup: Open Backup Folder"
+      }
+    ],
+    "configuration": {
+      "title": "Extension State Backup",
+      "properties": {
+        "extensionStateBackup.defaultBackupLocation": {
+          "type": "string",
+          "default": "",
+          "description": "Optional absolute folder path where extension backup runs are written. When empty, you will be prompted each time."
+        },
+        "extensionStateBackup.includeBuiltIn": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include built-in VS Code extensions in backup runs. Usually leave this disabled because built-ins are restored by VS Code itself."
+        },
+        "extensionStateBackup.includeExtensionFiles": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include each extension's installed files in its backup archive. Disable this only when you want configuration and storage state snapshots."
+        },
+        "extensionStateBackup.includeCurrentWorkspaceStorage": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include the current workspace storage folder for each extension when available. Other workspaces are not scanned."
+        },
+        "extensionStateBackup.confirmBeforeRestore": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ask for confirmation before overwriting an installed extension directory, global storage, workspace storage, or configuration values."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "^20.14.12",
+    "@types/vscode": "^1.92.0",
+    "typescript": "^5.5.4",
+    "@vscode/vsce": "^3.6.2"
+  }
+}
