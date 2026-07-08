@@ -105,8 +105,9 @@
     "watch": "tsc -watch -p ./",
     "vscode:prepublish": "npm run compile",
     "package": "vsce package",
-    "test": "npm run compile && node test/regression-test.js",
-    "test:regression": "npm run compile && node test/regression-test.js",
+    "test": "npm run compile && node test/regression-test.js && node test/external-discovery-test.js",
+    "test:regression": "npm run compile && node test/regression-test.js && node test/external-discovery-test.js",
+    "test:external-discovery": "npm run compile && node test/external-discovery-test.js",
     "test:smoke": "npm run compile && node test/smoke-test.js"
   },
   "dependencies": {
