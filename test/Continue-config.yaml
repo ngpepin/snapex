@@ -1,0 +1,70 @@
+name: Local Config
+version: 1.0.0
+schema: v1
+models:
+  - name: CatGPT
+    provider: "openai"
+    model: "catgpt-1"
+    apiBase: "http://localhost:4045/v1"
+    apiKey: "dummy123"
+    roles:
+      - chat
+      - edit
+      - apply
+    requestOptions:
+      timeout: 300000
+  - name: Custom GPT-4.1
+    provider: "openai"
+    model: "gpt-4.1"
+    apiBase: "http://localhost:4142/v1"
+    apiKey: "sk-123"
+    roles:
+      - chat
+      - edit
+      - apply
+  - name: Custom GPT-4.1
+    provider: "openai"
+    model: "gpt-4.1"
+    apiBase: "http://localhost:4142/v1"
+    apiKey: "sk-123"
+    roles:
+      - autocomplete
+  - name: Custom GPT-4o
+    provider: "openai"
+    model: "gpt-4o"
+    apiBase: "http://localhost:4142/v1"
+    apiKey: "sk-123"
+    roles:
+      - chat
+      - edit
+      - apply
+  - name: Custom GPT-4o
+    provider: "openai"
+    model: "gpt-4o"
+    apiBase: "http://localhost:4142/v1"
+    apiKey: "sk-123"
+    roles:
+      - autocomplete
+  - name: claude-coder-64k
+    provider: "ollama"
+    model: "claude-coder-64k"
+    apiBase: "http://localhost:11434"
+    apiKey: "sk-123"
+    roles:
+      - chat
+      - edit
+      - apply
+  - name: claude-coder-64k
+    provider: "ollama"
+    model: "claude-coder-64k"
+    apiBase: "http://localhost:11434"
+    apiKey: "sk-123"
+    roles:
+      - autocomplete
+  - name: Nomic Embed
+    provider: "ollama"
+    model: "nomic-embed-text:latest"
+    apiBase: "http://localhost:11434"
+    apiKey: "sk-123"
+    roles:
+      - embed
