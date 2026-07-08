@@ -47,17 +47,24 @@ From this project folder:
 
 ```bash
 npm install
-npm run compile
 npm run package
 ```
 
-Then install the generated `.vsix` file:
+Then install the generated `.vsix` file. The command-line install is recommended while developing because `--force` replaces an existing local install of the same extension id:
 
 ```bash
-code --install-extension snapex-0.1.0.vsix --force
+code --install-extension snapex-0.1.1.vsix --force
 ```
 
 Reload VS Code after installation.
+
+To verify that VS Code sees the extension:
+
+```bash
+code --list-extensions --show-versions | grep '^local-tools.snapex@'
+```
+
+You can also open the Command Palette and run `SnapEx: Backup All Extensions`.
 
 ## Development
 
