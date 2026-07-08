@@ -131,17 +131,29 @@ async function main() {
   assert(registered.has('extensionStateBackup.restoreFromZip'));
 
   await registered.get('extensionStateBackup.backupAll')();
-  const backupFolderNames = await fs.readdir(backupRoot);
-  assert.strictEqual(backupFolderNames.length, 1);
+  const backupPackageNames = await fs.readdir(backupRoot);
+  assert.strictEqual(backupPackageNames.length, 1);
   assert.match(
-    backupFolderNames[0],
-    /^vscode-extension-backup-Continue\.continue-2\.0\.0_\d{12}(AM|PM)$/,
-    `Unexpected backup folder name: ${backupFolderNames[0]}`
+    backupPackageNames[0],
+    /^vscode-extension-backup-Continue\.continue-2\.0\.0_\d{12}(AM|PM)\.zip$/,
+    `Unexpected backup package name: ${backupPackageNames[0]}`
   );
 
-  const runDir = path.join(backupRoot, backupFolderNames[0]);
-  const archivePath = path.join(runDir, 'Continue.continue-2.0.0.zip');
-  const zip = new AdmZip(archivePath);
+  const backupPackageBaseName = backupPackageNames[0].replace(/\.zip$/, '');
+  const finalArchivePath = path.join(backupRoot, backupPackageNames[0]);
+  const deletedRunDirectory = path.join(backupRoot, backupPackageBaseName);
+  await assert.rejects(() => fs.stat(deletedRunDirectory), (error) => error && error.code === 'ENOENT');
+
+  const outerZip = new AdmZip(finalArchivePath);
+  const outerEntryNames = outerZip.getEntries().map((entry) => entry.entryName);
+  const nestedArchiveEntryName = `${backupPackageBaseName}/Continue.continue-2.0.0.zip`;
+  assert(outerEntryNames.includes(`${backupPackageBaseName}/backup-index.json`));
+  assert(outerEntryNames.includes(nestedArchiveEntryName));
+
+  const nestedArchiveEntry = outerZip.getEntry(nestedArchiveEntryName);
+  assert(nestedArchiveEntry, `Missing nested archive entry: ${nestedArchiveEntryName}`);
+
+  const zip = new AdmZip(nestedArchiveEntry.getData());
   const entryNames = zip.getEntries().map((entry) => entry.entryName);
 
   for (const expectedEntry of [
@@ -170,7 +182,7 @@ async function main() {
   await fs.writeFile(path.join(workspaceStorageRoot, 'continue.continue', 'workspace.json'), JSON.stringify({ workspace: false }));
   await fs.writeFile(continueConfigPath, 'stale continue config', 'utf8');
 
-  nextOpenDialog = [{ fsPath: archivePath }];
+  nextOpenDialog = [{ fsPath: finalArchivePath }];
   await registered.get('extensionStateBackup.restoreFromZip')();
 
   assert.strictEqual(await fs.readFile(path.join(sampleExt, 'nested', 'feature.txt'), 'utf8'), 'original extension content');
@@ -182,7 +194,7 @@ async function main() {
   assert(updatedSettings.some((entry) => entry.key === 'continue.enableConsole' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.WorkspaceFolder));
   assert(updatedSettings.some((entry) => entry.key === 'continue.enableQuickActions' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.Global));
 
-  console.log(`Smoke test passed: ${path.basename(archivePath)} in ${path.basename(runDir)} contained ${entryNames.length} entries and restore replayed ${updatedSettings.length} settings.`);
+  console.log(`Smoke test passed: ${path.basename(finalArchivePath)} contained ${entryNames.length} extension entries and restore replayed ${updatedSettings.length} settings.`);
 }
 
 main().catch((error) => {
