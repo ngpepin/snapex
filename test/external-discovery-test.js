@@ -110,17 +110,8 @@ async function main() {
       ProgressLocation: { Notification: 15 }
     };
 
-    const originalLoad = Module._load;
     const compiledExtensionPath = path.join(process.cwd(), 'out', 'extension.js');
-    delete require.cache[require.resolve(compiledExtensionPath)];
-    Module._load = function patchedLoad(request, parent, isMain) {
-      if (request === 'vscode') {
-        return fakeVscode;
-      }
-      return originalLoad.apply(this, arguments);
-    };
-
-    try {
+    await runWithMockedVscode(compiledExtensionPath, fakeVscode, async () => {
       const extensionModule = require(compiledExtensionPath);
       extensionModule.activate({
         subscriptions: [],
@@ -131,10 +122,7 @@ async function main() {
       });
 
       await registered.get('extensionStateBackup.backupAll')();
-    } finally {
-      Module._load = originalLoad;
-      delete require.cache[require.resolve(compiledExtensionPath)];
-    }
+    });
 
     const [packageName] = await fs.readdir(backupRoot);
     assert.match(packageName, /^vscode-extension-backup-Acme\.generic-tool-1\.0\.0_\d{12}(AM|PM)\.zip$/);
@@ -170,17 +158,7 @@ async function main() {
     await fs.writeFile(xdgConfigPath, 'enabled: false\n', 'utf8');
     openDialogResponses.push([{ fsPath: path.join(backupRoot, packageName) }]);
 
-    const originalLoad = Module._load;
-    const compiledExtensionPath = path.join(process.cwd(), 'out', 'extension.js');
-    delete require.cache[require.resolve(compiledExtensionPath)];
-    Module._load = function patchedLoad(request, parent, isMain) {
-      if (request === 'vscode') {
-        return fakeVscode;
-      }
-      return originalLoad.apply(this, arguments);
-    };
-
-    try {
+    await runWithMockedVscode(compiledExtensionPath, fakeVscode, async () => {
       const extensionModule = require(compiledExtensionPath);
       extensionModule.activate({
         subscriptions: [],
@@ -191,10 +169,7 @@ async function main() {
       });
 
       await registered.get('extensionStateBackup.restoreFromZip')();
-    } finally {
-      Module._load = originalLoad;
-      delete require.cache[require.resolve(compiledExtensionPath)];
-    }
+    });
 
     assert.strictEqual(await fs.readFile(hiddenConfigPath, 'utf8'), '{"theme":"generic"}\n');
     assert.strictEqual(await fs.readFile(hiddenStatePath, 'utf8'), '{"session":"saved"}\n');
@@ -205,6 +180,24 @@ async function main() {
   } finally {
     delete process.env.SNAPEX_TEST_HOME;
     await fs.rm(root, { recursive: true, force: true });
+  }
+}
+
+async function runWithMockedVscode(compiledExtensionPath, fakeVscode, callback) {
+  const originalLoad = Module._load;
+  delete require.cache[require.resolve(compiledExtensionPath)];
+  Module._load = function patchedLoad(request, parent, isMain) {
+    if (request === 'vscode') {
+      return fakeVscode;
+    }
+    return originalLoad.apply(this, arguments);
+  };
+
+  try {
+    await callback();
+  } finally {
+    Module._load = originalLoad;
+    delete require.cache[require.resolve(compiledExtensionPath)];
   }
 }
 
