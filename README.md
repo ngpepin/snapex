@@ -1,15 +1,15 @@
-# Extension State Backup
+# SnapEx
 
-A local VS Code extension that creates one zip archive per installed extension. Each archive contains the extension files plus a best-effort snapshot of that extension's configuration and storage folders.
+SnapEx is a local VS Code extension that creates one zip archive per installed extension. Each archive contains the extension files plus a best-effort snapshot of that extension's configuration and storage folders.
 
 ## Commands
 
-Open the Command Palette and run one of these commands:
+Open the SnapEx Activity Bar icon (`snapex-icon.png`), or open the Command Palette and run one of these commands:
 
-- `Extension State Backup: Backup All Extensions`
-- `Extension State Backup: Backup Selected Extension`
-- `Extension State Backup: Restore Extension from Zip`
-- `Extension State Backup: Open Backup Folder`
+- `SnapEx: Backup All Extensions`
+- `SnapEx: Backup Selected Extension`
+- `SnapEx: Restore Extension from Zip`
+- `SnapEx: Open Backup Folder`
 
 ## What each zip contains
 
@@ -54,7 +54,7 @@ npm run package
 Then install the generated `.vsix` file:
 
 ```bash
-code --install-extension extension-state-backup-0.1.0.vsix --force
+code --install-extension snapex-0.1.0.vsix --force
 ```
 
 Reload VS Code after installation.
