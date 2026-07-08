@@ -2,6 +2,10 @@
 
 SnapEx is a local VS Code extension that creates one final zip package per installed extension. Each package contains a timestamped backup folder with the extension archive plus a best-effort snapshot of that extension's configuration, selected external state files, and storage folders.
 
+## User guide
+
+See [USER-GUIDE.md](USER-GUIDE.md) for step-by-step installation, backup, restore, inspection, troubleshooting, and usage examples.
+
 ## Commands
 
 Open the SnapEx Activity Bar icon (`snapex-icon.png`), or open the Command Palette and run one of these commands:
