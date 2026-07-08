@@ -5,6 +5,7 @@
 - Back up and restore known external state files under the user's home directory.
 - Capture Continue's `~/.continue/config.yaml` as `externalState/home/.continue/config.yaml`.
 - Add smoke-test coverage for Continue config backup and restore.
+- Add `update-extension.sh` to automate pulling, testing, packaging, and reinstalling the current SnapEx VSIX.
 
 ## 0.1.0
 
