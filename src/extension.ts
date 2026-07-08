@@ -4,8 +4,9 @@ import * as path from 'path';
 import * as os from 'os';
 import AdmZip from 'adm-zip';
 
-const SELF_EXTENSION_ID = 'local-tools.extension-state-backup';
-const BACKUP_SCHEMA_VERSION = 1;
+const SELF_EXTENSION_IDS = new Set(['local-tools.snapex', 'local-tools.extension-state-backup']);
+const BACKUP_SCHEMA_VERSION = 2;
+const MIN_SUPPORTED_BACKUP_SCHEMA_VERSION = 1;
 
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 
@@ -38,6 +39,13 @@ interface FileModeRecord {
   mode: number;
 }
 
+interface ExternalStateRecord {
+  archivePath: string;
+  homeRelativePath: string;
+  sourcePath: string;
+  mode?: number;
+}
+
 interface BackupManifest {
   schemaVersion: number;
   createdAt: string;
@@ -66,6 +74,7 @@ interface BackupManifest {
     configuration: boolean;
     globalStorage: boolean;
     currentWorkspaceStorage: boolean;
+    externalState?: boolean;
   };
   notes: string[];
 }
@@ -179,7 +188,7 @@ async function restoreFromZip(context: vscode.ExtensionContext): Promise<void> {
 
   if (settings.confirmBeforeRestore) {
     const answer = await vscode.window.showWarningMessage(
-      `Restore ${manifest.extension.id}@${manifest.extension.version}? This can overwrite the installed extension, its captured configuration values, and captured storage folders.`,
+      `Restore ${manifest.extension.id}@${manifest.extension.version}? This can overwrite the installed extension, its captured configuration values, storage folders, and external state files.`,
       { modal: true },
       'Restore'
     );
@@ -214,6 +223,11 @@ async function restoreFromZip(context: vscode.ExtensionContext): Promise<void> {
       progress.report({ message: 'Restoring configuration values' });
       if (manifest.contents.configuration) {
         await restoreConfiguration(zip);
+      }
+
+      progress.report({ message: 'Restoring external state files' });
+      if (manifest.contents.externalState) {
+        await restoreExternalState(zip);
       }
     }
   );
@@ -292,8 +306,9 @@ async function createExtensionBackup(
   settings: ExtensionBackupSettings
 ): Promise<string> {
   const zip = new AdmZip();
-  const manifest = await buildManifest(context, extension, settings);
   const configurationSnapshot = collectConfigurationSnapshot(extension.packageJSON);
+  const externalStateRecords = await collectExternalStateRecords(extension);
+  const manifest = await buildManifest(context, extension, settings, externalStateRecords);
 
   zip.addFile('manifest.json', Buffer.from(JSON.stringify(manifest, null, 2), 'utf8'));
   zip.addFile('configuration/configuration.json', Buffer.from(JSON.stringify(configurationSnapshot, null, 2), 'utf8'));
@@ -324,6 +339,10 @@ async function createExtensionBackup(
     }
   }
 
+  if (externalStateRecords.length > 0) {
+    await addExternalStateToZip(zip, externalStateRecords);
+  }
+
   const archivePath = path.join(runDirectory, backupFileNameFor(extension));
   zip.writeZip(archivePath);
   return archivePath;
@@ -332,7 +351,8 @@ async function createExtensionBackup(
 async function buildManifest(
   context: vscode.ExtensionContext,
   extension: vscode.Extension<unknown>,
-  settings: ExtensionBackupSettings
+  settings: ExtensionBackupSettings,
+  externalStateRecords: ExternalStateRecord[]
 ): Promise<BackupManifest> {
   const hasGlobalStorage = Boolean(await firstExistingPath([
     path.join(getGlobalStorageRoot(context), extension.id),
@@ -353,7 +373,7 @@ async function buildManifest(
       uiKind: vscode.env.uiKind === vscode.UIKind.Desktop ? 'Desktop' : 'Web',
       platform: process.platform,
       arch: process.arch,
-      homeDir: os.homedir()
+      homeDir: getHomeDir()
     },
     extension: {
       id: extension.id,
@@ -370,12 +390,14 @@ async function buildManifest(
       extensionFiles: settings.includeExtensionFiles,
       configuration: true,
       globalStorage: hasGlobalStorage,
-      currentWorkspaceStorage: hasWorkspaceStorage
+      currentWorkspaceStorage: hasWorkspaceStorage,
+      externalState: externalStateRecords.length > 0
     },
     notes: [
-      'This backup includes installed extension files, contributed VS Code configuration values, per-extension globalStorage, and current-workspace storage when available.',
+      'This backup includes installed extension files, contributed VS Code configuration values, selected external state files, per-extension globalStorage, and current-workspace storage when available.',
       'VS Code does not expose another extension\'s SecretStorage, OS keychain entries, authentication sessions, or all private Memento records through the public API, so those items are not included.',
-      'Workspace storage is limited to the workspace open when the backup command ran.'
+      'Workspace storage is limited to the workspace open when the backup command ran.',
+      'External state files are limited to known extension-owned config files under the user home directory, such as Continue\'s ~/.continue/config.yaml.'
     ]
   };
 }
@@ -452,6 +474,99 @@ function getContributedConfigurationKeys(packageJson: Record<string, unknown>): 
   }
 
   return [...keys].sort();
+}
+
+async function collectExternalStateRecords(extension: vscode.Extension<unknown>): Promise<ExternalStateRecord[]> {
+  const records: ExternalStateRecord[] = [];
+
+  for (const homeRelativePath of getKnownHomeRelativeExternalStatePaths(extension)) {
+    const archiveRelativePath = normalizeHomeRelativePathForArchive(homeRelativePath);
+    if (!archiveRelativePath) {
+      continue;
+    }
+
+    const sourcePath = safeJoin(getHomeDir(), fromArchivePath(archiveRelativePath));
+
+    try {
+      const stat = await fs.stat(sourcePath);
+      if (!stat.isFile()) {
+        continue;
+      }
+
+      records.push({
+        archivePath: `externalState/home/${archiveRelativePath}`,
+        homeRelativePath: archiveRelativePath,
+        sourcePath,
+        mode: stat.mode & 0o777
+      });
+    } catch {
+      // Missing external state files are normal.
+    }
+  }
+
+  return records.sort((a, b) => a.archivePath.localeCompare(b.archivePath));
+}
+
+function getKnownHomeRelativeExternalStatePaths(extension: vscode.Extension<unknown>): string[] {
+  if (extension.id.toLowerCase() === 'continue.continue') {
+    return [
+      '.continue/config.yaml'
+    ];
+  }
+
+  return [];
+}
+
+async function addExternalStateToZip(zip: AdmZip, records: ExternalStateRecord[]): Promise<void> {
+  for (const record of records) {
+    zip.addFile(record.archivePath, await fs.readFile(record.sourcePath));
+  }
+
+  zip.addFile('metadata/external-state.json', Buffer.from(JSON.stringify(records, null, 2), 'utf8'));
+}
+
+async function restoreExternalState(zip: AdmZip): Promise<void> {
+  const metadataEntry = zip.getEntry('metadata/external-state.json');
+  const records = metadataEntry
+    ? JSON.parse(metadataEntry.getData().toString('utf8')) as ExternalStateRecord[]
+    : deriveExternalStateRecordsFromArchive(zip);
+
+  for (const record of records) {
+    if (!record.homeRelativePath || !record.archivePath) {
+      continue;
+    }
+
+    const entry = zip.getEntry(record.archivePath);
+    if (!entry || entry.isDirectory) {
+      continue;
+    }
+
+    const targetPath = safeJoin(getHomeDir(), fromArchivePath(record.homeRelativePath));
+    await fs.mkdir(path.dirname(targetPath), { recursive: true });
+    await fs.writeFile(targetPath, entry.getData());
+
+    if (typeof record.mode === 'number') {
+      try {
+        await fs.chmod(targetPath, record.mode);
+      } catch {
+        // Best effort: chmod may fail on Windows, read-only filesystems, or remote environments.
+      }
+    }
+  }
+}
+
+function deriveExternalStateRecordsFromArchive(zip: AdmZip): ExternalStateRecord[] {
+  const prefix = 'externalState/home/';
+  return zip.getEntries()
+    .filter((entry) => entry.entryName.startsWith(prefix) && !entry.isDirectory)
+    .map((entry) => {
+      const homeRelativePath = entry.entryName.slice(prefix.length);
+      return {
+        archivePath: entry.entryName,
+        homeRelativePath,
+        sourcePath: safeJoin(getHomeDir(), fromArchivePath(homeRelativePath))
+      };
+    });
 }
 
 async function restoreExtensionFiles(context: vscode.ExtensionContext, zip: AdmZip, manifest: BackupManifest): Promise<void> {
@@ -556,8 +671,8 @@ function readManifest(zip: AdmZip): BackupManifest {
   }
 
   const manifest = JSON.parse(entry.getData().toString('utf8')) as BackupManifest;
-  if (manifest.schemaVersion !== BACKUP_SCHEMA_VERSION || !manifest.extension?.id) {
-    throw new Error('This zip is not a supported Extension State Backup archive.');
+  if (!manifest.extension?.id || manifest.schemaVersion < MIN_SUPPORTED_BACKUP_SCHEMA_VERSION || manifest.schemaVersion > BACKUP_SCHEMA_VERSION) {
+    throw new Error('This zip is not a supported SnapEx backup archive.');
   }
 
   return manifest;
@@ -566,7 +681,7 @@ function readManifest(zip: AdmZip): BackupManifest {
 async function resolveExtensionsRoot(context: vscode.ExtensionContext): Promise<string> {
   const installedExtension = vscode.extensions.all.find((extension) =>
     !extension.packageJSON?.isBuiltin &&
-    extension.id.toLowerCase() !== SELF_EXTENSION_ID &&
+    !SELF_EXTENSION_IDS.has(extension.id.toLowerCase()) &&
     extension.extensionPath &&
     path.dirname(extension.extensionPath) !== path.dirname(context.extensionPath)
   );
@@ -596,6 +711,10 @@ async function resolveExtensionsRoot(context: vscode.ExtensionContext): Promise<
 
 function getGlobalStorageRoot(context: vscode.ExtensionContext): string {
   return path.dirname(context.globalStorageUri.fsPath);
+}
+
+function getHomeDir(): string {
+  return process.env.SNAPEX_TEST_HOME || os.homedir();
 }
 
 async function collectFileModes(rootDirectory: string): Promise<FileModeRecord[]> {
@@ -672,6 +791,23 @@ function safeJoin(rootDirectory: string, relativePath: string): string {
   }
 
   return targetPath;
+}
+
+function normalizeHomeRelativePathForArchive(relativePath: string): string | undefined {
+  if (path.isAbsolute(relativePath)) {
+    return undefined;
+  }
+
+  const parts = relativePath.split(/[\\/]+/).filter(Boolean);
+  if (parts.length === 0 || parts.some((part) => part === '..')) {
+    return undefined;
+  }
+
+  return parts.join('/');
+}
+
+function fromArchivePath(filePath: string): string {
+  return filePath.split('/').join(path.sep);
 }
 
 function toArchivePath(filePath: string): string {
