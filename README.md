@@ -44,27 +44,28 @@ The archive is still useful for restoring the installed extension files, contrib
 - `extensionStateBackup.includeCurrentWorkspaceStorage`: Include storage for the currently open workspace. Enabled by default.
 - `extensionStateBackup.confirmBeforeRestore`: Ask before overwriting files/settings/storage during restore. Enabled by default.
 
-## Install locally
+## Update and install locally
 
-From this project folder:
-
-```bash
-npm install
-npm run package
-```
-
-Then install the generated `.vsix` file. The command-line install is recommended while developing because `--force` replaces an existing local install of the same extension id:
+From this project folder, run:
 
 ```bash
-code --install-extension snapex-0.1.2.vsix --force
+bash update-extension.sh
 ```
 
-Reload VS Code after installation.
+The script fetches the latest `origin/main` and tags, fast-forwards the local branch, installs npm dependencies, runs the smoke test, packages the VSIX for the current `package.json` version, uninstalls older SnapEx extension ids, and reinstalls the newly packaged VSIX with `--force`.
 
-To verify that VS Code sees the extension:
+After it finishes, reload VS Code.
+
+To verify that VS Code sees the extension, run the final verification command printed by the script, or run:
 
 ```bash
 code --list-extensions --show-versions | grep '^local-tools.snapex@'
+```
+
+For a local branch that must be force-aligned with GitHub first, run:
+
+```bash
+bash update-extension.sh --reset-to-origin
 ```
 
 You can also open the Command Palette and run `SnapEx: Backup All Extensions`.
