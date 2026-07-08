@@ -1,6 +1,6 @@
 # SnapEx
 
-SnapEx is a local VS Code extension that creates one zip archive per installed extension. Each archive contains the extension files plus a best-effort snapshot of that extension's configuration, selected external state files, and storage folders.
+SnapEx is a local VS Code extension that creates one final zip package per installed extension. Each package contains a timestamped backup folder with the extension archive plus a best-effort snapshot of that extension's configuration, selected external state files, and storage folders.
 
 ## Commands
 
@@ -11,25 +11,25 @@ Open the SnapEx Activity Bar icon (`snapex-icon.png`), or open the Command Palet
 - `SnapEx: Restore Extension from Zip`
 - `SnapEx: Open Backup Folder`
 
-## Backup folder names
+## Backup package names
 
-Each extension backup is written into its own folder using this format:
-
-```text
-vscode-extension-backup-<extension-name-and-version>_YYYYMMDDHHMMAM/PM
-```
-
-The timestamp is generated from the local time of the machine running VS Code. For example, a Continue `2.0.0` backup made at 4:05 PM on July 8, 2026 would use a folder name like:
+Each extension backup is staged in its own folder, then SnapEx writes a final `.zip` of that folder and deletes the uncompressed folder. The final package uses this format:
 
 ```text
-vscode-extension-backup-Continue.continue-2.0.0_202607080405PM
+vscode-extension-backup-<extension-name-and-version>_YYYYMMDDHHMMAM/PM.zip
 ```
 
-The `.zip` archive inside that folder keeps the shorter extension archive name, such as `Continue.continue-2.0.0.zip`.
+The timestamp is generated from the local time of the machine running VS Code. For example, a Continue `2.0.0` backup made at 4:05 PM on July 8, 2026 would produce:
 
-## What each zip contains
+```text
+vscode-extension-backup-Continue.continue-2.0.0_202607080405PM.zip
+```
 
-Each extension backup is written as a separate `.zip` file and contains:
+Inside the final package, the backed-up folder contains `backup-index.json` and the shorter extension archive, such as `Continue.continue-2.0.0.zip`.
+
+## What each extension archive contains
+
+The nested extension archive contains:
 
 - `manifest.json` with the extension id, version, original install folder, source environment, and archive contents.
 - `extension/` with the installed extension files, when `extensionStateBackup.includeExtensionFiles` is enabled.
@@ -39,6 +39,8 @@ Each extension backup is written as a separate `.zip` file and contains:
 - `externalState/home/` with selected extension-owned config files from the user's home directory, when present. For Continue, this includes `~/.continue/config.yaml`.
 - `metadata/external-state.json` with restore metadata for files captured under `externalState/home/`.
 - `metadata/extension-file-modes.json` with executable/file mode metadata so restored extension files can keep Unix permissions when possible.
+
+The restore command accepts either the final `vscode-extension-backup-...zip` package or the nested extension archive directly.
 
 ## What cannot be fully backed up
 
@@ -54,7 +56,7 @@ The archive is still useful for restoring the installed extension files, contrib
 
 ## Settings
 
-- `extensionStateBackup.defaultBackupLocation`: Optional absolute folder path where backup runs are written.
+- `extensionStateBackup.defaultBackupLocation`: Optional absolute folder path where backup packages are written.
 - `extensionStateBackup.includeBuiltIn`: Include built-in VS Code extensions. Disabled by default.
 - `extensionStateBackup.includeExtensionFiles`: Include the installed extension directory. Enabled by default.
 - `extensionStateBackup.includeCurrentWorkspaceStorage`: Include storage for the currently open workspace. Enabled by default.
@@ -101,12 +103,13 @@ Press `F5` in VS Code to launch an Extension Development Host.
 
 When restoring a backup zip, the extension:
 
-1. Reads `manifest.json` to identify the target extension.
-2. Removes the currently installed extension directory if that extension already exists.
-3. Extracts the backed-up `extension/` files into the extension install folder.
-4. Restores captured `globalStorage/` and current-workspace storage folders.
-5. Restores captured contributed settings.
-6. Restores captured external state files under the current user's home directory, such as `~/.continue/config.yaml`.
-7. Prompts you to reload the VS Code window.
+1. Opens either the final backup package or a nested extension archive.
+2. Reads `manifest.json` to identify the target extension.
+3. Removes the currently installed extension directory if that extension already exists.
+4. Extracts the backed-up `extension/` files into the extension install folder.
+5. Restores captured `globalStorage/` and current-workspace storage folders.
+6. Restores captured contributed settings.
+7. Restores captured external state files under the current user's home directory, such as `~/.continue/config.yaml`.
+8. Prompts you to reload the VS Code window.
 
 Restoring an active extension can fail on locked files, especially on Windows. Closing extra VS Code windows and retrying usually helps.
