@@ -101,14 +101,14 @@ async function backupAllExtensions(context: vscode.ExtensionContext): Promise<vo
     return;
   }
 
-  const runDirectory = await chooseBackupRunDirectory(settings);
-  if (!runDirectory) {
+  const baseDirectory = await chooseBackupBaseDirectory(settings);
+  if (!baseDirectory) {
     return;
   }
 
-  await withBackupProgress(`Backing up ${extensions.length} extensions`, async (progress) => {
-    const archives: string[] = [];
+  const timestamp = new Date();
 
+  await withBackupProgress(`Backing up ${extensions.length} extensions`, async (progress) => {
     for (let index = 0; index < extensions.length; index += 1) {
       const extension = extensions[index];
       progress.report({
@@ -116,19 +116,18 @@ async function backupAllExtensions(context: vscode.ExtensionContext): Promise<vo
         increment: index === 0 ? 0 : 100 / extensions.length
       });
 
+      const runDirectory = await createBackupRunDirectory(baseDirectory, extension, timestamp);
       const archivePath = await createExtensionBackup(context, extension, runDirectory, settings);
-      archives.push(archivePath);
+      await writeBackupIndex(runDirectory, [archivePath]);
     }
-
-    await writeBackupIndex(runDirectory, archives);
   });
 
   const open = await vscode.window.showInformationMessage(
-    `Backed up ${extensions.length} extensions to ${runDirectory}.`,
+    `Backed up ${extensions.length} extensions to ${baseDirectory}.`,
     'Open Folder'
   );
   if (open === 'Open Folder') {
-    await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(runDirectory));
+    await vscode.commands.executeCommand('revealFileInOS', vscode.Uri.file(baseDirectory));
   }
 }
 
@@ -149,14 +148,16 @@ async function backupSelectedExtension(context: vscode.ExtensionContext): Promis
     return;
   }
 
-  const runDirectory = await chooseBackupRunDirectory(settings);
-  if (!runDirectory) {
+  const baseDirectory = await chooseBackupBaseDirectory(settings);
+  if (!baseDirectory) {
     return;
   }
 
+  const runDirectory = await createBackupRunDirectory(baseDirectory, picked.extension, new Date());
+
   await withBackupProgress(`Backing up ${picked.extension.id}`, async () => {
-    await createExtensionBackup(context, picked.extension, runDirectory, settings);
-    await writeBackupIndex(runDirectory, [path.join(runDirectory, backupFileNameFor(picked.extension))]);
+    const archivePath = await createExtensionBackup(context, picked.extension, runDirectory, settings);
+    await writeBackupIndex(runDirectory, [archivePath]);
   });
 
   const open = await vscode.window.showInformationMessage(
@@ -274,8 +275,7 @@ function getBackupCandidates(includeBuiltIn: boolean): vscode.Extension<unknown>
     .sort((a, b) => a.id.localeCompare(b.id));
 }
 
-async function chooseBackupRunDirectory(settings: ExtensionBackupSettings): Promise<string | undefined> {
-  const timestamp = new Date().toISOString().replace(/[.:]/g, '-');
+async function chooseBackupBaseDirectory(settings: ExtensionBackupSettings): Promise<string | undefined> {
   const configuredPath = settings.defaultBackupLocation.trim();
   const baseDirectory = configuredPath || await promptForBackupDirectory();
 
@@ -283,9 +283,30 @@ async function chooseBackupRunDirectory(settings: ExtensionBackupSettings): Prom
     return undefined;
   }
 
-  const runDirectory = path.join(baseDirectory, `vscode-extension-backup-${timestamp}`);
-  await fs.mkdir(runDirectory, { recursive: true });
-  return runDirectory;
+  await fs.mkdir(baseDirectory, { recursive: true });
+  return baseDirectory;
+}
+
+async function createBackupRunDirectory(baseDirectory: string, extension: vscode.Extension<unknown>, timestamp: Date): Promise<string> {
+  const folderName = backupRunDirectoryNameFor(extension, timestamp);
+
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const suffix = attempt === 0 ? '' : `_${attempt + 1}`;
+    const candidate = path.join(baseDirectory, `${folderName}${suffix}`);
+
+    try {
+      await fs.mkdir(candidate, { recursive: false });
+      return candidate;
+    } catch (error) {
+      if (isNodeError(error) && error.code === 'EEXIST') {
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  throw new Error(`Could not create a unique backup folder for ${extension.id}.`);
 }
 
 async function promptForBackupDirectory(): Promise<string | undefined> {
@@ -773,6 +794,35 @@ async function removeDirectoryIfExists(directoryPath: string): Promise<void> {
   }
 }
 
+function backupRunDirectoryNameFor(extension: vscode.Extension<unknown>, timestamp: Date): string {
+  const extensionNameAndVersion = `${extensionNameForBackupFolder(extension)}-${extension.packageJSON?.version ?? 'unknown'}`;
+  return `vscode-extension-backup-${safeFileName(extensionNameAndVersion)}_${formatLocalBackupTimestamp(timestamp)}`;
+}
+
+function extensionNameForBackupFolder(extension: vscode.Extension<unknown>): string {
+  const packageJson = extension.packageJSON as Record<string, unknown> | undefined;
+  const publisher = typeof packageJson?.publisher === 'string' ? packageJson.publisher : undefined;
+  const name = typeof packageJson?.name === 'string' ? packageJson.name : undefined;
+
+  if (publisher && name) {
+    return `${publisher}.${name}`;
+  }
+
+  return extension.id;
+}
+
+function formatLocalBackupTimestamp(date: Date): string {
+  const hours24 = date.getHours();
+  const hours12 = hours24 % 12 || 12;
+  const meridiem = hours24 >= 12 ? 'PM' : 'AM';
+
+  return `${date.getFullYear()}${pad2(date.getMonth() + 1)}${pad2(date.getDate())}${pad2(hours12)}${pad2(date.getMinutes())}${meridiem}`;
+}
+
+function pad2(value: number): string {
+  return value.toString().padStart(2, '0');
+}
+
 function backupFileNameFor(extension: vscode.Extension<unknown>): string {
   const version = extension.packageJSON?.version ?? 'unknown';
   return `${safeFileName(extension.id)}-${safeFileName(version)}.zip`;
@@ -820,6 +870,10 @@ function asRecord(value: unknown): Record<string, unknown> | undefined {
   }
 
   return undefined;
+}
+
+function isNodeError(error: unknown): error is NodeJS.ErrnoException {
+  return error instanceof Error;
 }
 
 async function withBackupProgress<T>(title: string, task: (progress: vscode.Progress<{ message?: string; increment?: number }>) => Thenable<T> | T): Promise<T> {
