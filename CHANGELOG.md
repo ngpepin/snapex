@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.5
+
+- Replace the Continue-only external-state path rule with generalized manifest-informed external config/state discovery.
+- Derive external-state candidate paths from extension id, manifest name/display name/publisher, repository basename, and contributed configuration key prefixes.
+- Search common user-level config/state locations under the home directory, including hidden folders, XDG config/data paths, macOS Application Support/Preferences, and Windows AppData paths.
+- Keep external-state discovery conservative by skipping cache/log/temp/build/dependency folders, ignoring symlinks, and applying per-file, per-extension file-count, and total-size limits.
+- Record a `discoveredBy` hint in `metadata/external-state.json` for each captured external-state file.
+- Add a non-Continue regression test that verifies generalized discovery, cache-folder skipping, restore, and settings replay for a generic extension.
+- Update README and USER-GUIDE documentation for generalized discovery behavior and limitations.
+
 ## 0.1.4
 
 - Package each extension backup folder into a final `.zip` file and delete the uncompressed folder after packaging.
