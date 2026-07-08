@@ -1,10 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Rename the extension to SnapEx.
+- Add a SnapEx Activity Bar container using `snapex-icon.png`.
+- Add an Actions view for backup and restore commands.
+
 ## 0.1.0
 
-Initial release.
-
-- Add backup commands for all installed extensions and one selected extension.
-- Store one zip archive per extension.
-- Capture installed extension files, contributed configuration values, global storage, and current workspace storage where accessible.
-- Add restore command that overwrites installed extension files and captured state after confirmation.
+- Initial release.
+- Back up installed extension directories into separate zip archives.
+- Capture contributed global/workspace configuration values.
+- Capture per-extension global storage folders and current-workspace storage folders when visible to the extension host.
+- Restore a selected backup zip over an installed extension and optionally restore captured configuration/storage.
