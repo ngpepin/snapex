@@ -52,7 +52,7 @@ From this project folder, run:
 bash update-extension.sh
 ```
 
-The script fetches the latest `origin/main` and tags, fast-forwards the local branch, installs npm dependencies, runs the smoke test, packages the VSIX for the current `package.json` version, uninstalls older SnapEx extension ids, and reinstalls the newly packaged VSIX with `--force`.
+The script fetches the latest `origin/main` and tags, fast-forwards the local branch, reports the current `package.json` version against the latest semver release/tag it can see, installs npm dependencies, runs the smoke test, packages the VSIX for the current version, uninstalls older SnapEx extension ids, and reinstalls the newly packaged VSIX with `--force`.
 
 After it finishes, reload VS Code.
 
@@ -67,6 +67,8 @@ For a local branch that must be force-aligned with GitHub first, run:
 ```bash
 bash update-extension.sh --reset-to-origin
 ```
+
+Use `--skip-pull` only when intentionally packaging the current checkout instead of the latest remote branch.
 
 You can also open the Command Palette and run `SnapEx: Backup All Extensions`.
 
