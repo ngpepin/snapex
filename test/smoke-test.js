@@ -6,38 +6,45 @@ const Module = require('module');
 const AdmZip = require('adm-zip');
 
 async function main() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'extension-state-backup-test-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'snapex-test-'));
   const backupRoot = path.join(root, 'backups');
   const extRoot = path.join(root, 'extensions');
-  const sampleExt = path.join(extRoot, 'publisher.sample-1.0.0');
+  const sampleExt = path.join(extRoot, 'continue.continue-2.0.0-linux-x64');
   const globalStorageRoot = path.join(root, 'globalStorage');
   const workspaceStorageRoot = path.join(root, 'workspaceStorage');
-  const selfGlobalStorage = path.join(globalStorageRoot, 'local-tools.extension-state-backup');
-  const selfWorkspaceStorage = path.join(workspaceStorageRoot, 'local-tools.extension-state-backup');
+  const fakeHome = path.join(root, 'home');
+  const continueConfigPath = path.join(fakeHome, '.continue', 'config.yaml');
+  const selfGlobalStorage = path.join(globalStorageRoot, 'local-tools.snapex');
+  const selfWorkspaceStorage = path.join(workspaceStorageRoot, 'local-tools.snapex');
+
+  process.env.SNAPEX_TEST_HOME = fakeHome;
 
   await fs.mkdir(path.join(sampleExt, 'nested'), { recursive: true });
   await fs.writeFile(path.join(sampleExt, 'nested', 'feature.txt'), 'original extension content');
-  await fs.mkdir(path.join(globalStorageRoot, 'publisher.sample'), { recursive: true });
-  await fs.writeFile(path.join(globalStorageRoot, 'publisher.sample', 'state.json'), JSON.stringify({ global: true }));
-  await fs.mkdir(path.join(workspaceStorageRoot, 'publisher.sample'), { recursive: true });
-  await fs.writeFile(path.join(workspaceStorageRoot, 'publisher.sample', 'workspace.json'), JSON.stringify({ workspace: true }));
+  await fs.mkdir(path.join(globalStorageRoot, 'continue.continue'), { recursive: true });
+  await fs.writeFile(path.join(globalStorageRoot, 'continue.continue', 'state.json'), JSON.stringify({ global: true }));
+  await fs.mkdir(path.join(workspaceStorageRoot, 'continue.continue'), { recursive: true });
+  await fs.writeFile(path.join(workspaceStorageRoot, 'continue.continue', 'workspace.json'), JSON.stringify({ workspace: true }));
+  await fs.mkdir(path.dirname(continueConfigPath), { recursive: true });
+  const continueConfig = await fs.readFile(path.join(process.cwd(), 'test', 'Continue-config.yaml'), 'utf8');
+  await fs.writeFile(continueConfigPath, continueConfig, 'utf8');
   await fs.mkdir(selfGlobalStorage, { recursive: true });
   await fs.mkdir(selfWorkspaceStorage, { recursive: true });
 
-  const sampleExtension = {
-    id: 'publisher.sample',
+  const continueExtension = {
+    id: 'Continue.continue',
     extensionPath: sampleExt,
     packageJSON: {
-      displayName: 'Sample Extension',
-      version: '1.0.0',
-      publisher: 'publisher',
-      name: 'sample',
+      displayName: 'Continue - open-source AI code agent',
+      version: '2.0.0',
+      publisher: 'Continue',
+      name: 'continue',
       isBuiltin: false,
       contributes: {
         configuration: {
           properties: {
-            'sample.enabled': { type: 'boolean' },
-            'sample.message': { type: 'string' }
+            'continue.enableConsole': { type: 'boolean' },
+            'continue.enableQuickActions': { type: 'boolean' }
           }
         }
       }
@@ -55,8 +62,8 @@ async function main() {
     Uri: { file: (fsPath) => ({ fsPath, toString: () => `file://${fsPath}` }) },
     env: { appName: 'Mock VS Code', appRoot: path.join(root, 'app'), uiKind: 1, remoteName: undefined },
     extensions: {
-      all: [sampleExtension],
-      getExtension: (id) => id === 'publisher.sample' ? sampleExtension : undefined
+      all: [continueExtension],
+      getExtension: (id) => id === 'Continue.continue' ? continueExtension : undefined
     },
     workspace: {
       workspaceFile: { fsPath: path.join(root, 'workspace.code-workspace') },
@@ -75,11 +82,11 @@ async function main() {
           return fallback;
         },
         inspect: (key) => {
-          if (key === 'sample.enabled') {
+          if (key === 'continue.enableConsole') {
             return { globalValue: true, workspaceValue: false, workspaceFolderValue: scope ? true : undefined };
           }
-          if (key === 'sample.message') {
-            return { globalValue: 'hello' };
+          if (key === 'continue.enableQuickActions') {
+            return { globalValue: true };
           }
           return undefined;
         },
@@ -125,7 +132,7 @@ async function main() {
 
   await registered.get('extensionStateBackup.backupAll')();
   const runDir = path.join(backupRoot, (await fs.readdir(backupRoot))[0]);
-  const archivePath = path.join(runDir, 'publisher.sample-1.0.0.zip');
+  const archivePath = path.join(runDir, 'Continue.continue-2.0.0.zip');
   const zip = new AdmZip(archivePath);
   const entryNames = zip.getEntries().map((entry) => entry.entryName);
 
@@ -134,31 +141,38 @@ async function main() {
     'configuration/configuration.json',
     'extension/nested/feature.txt',
     'globalStorage/state.json',
-    'workspaceStorage/current/workspace.json'
+    'workspaceStorage/current/workspace.json',
+    'externalState/home/.continue/config.yaml',
+    'metadata/external-state.json'
   ]) {
     assert(entryNames.includes(expectedEntry), `Missing archive entry: ${expectedEntry}`);
   }
 
+  assert.strictEqual(zip.getEntry('externalState/home/.continue/config.yaml').getData().toString('utf8'), continueConfig);
+
   const manifest = JSON.parse(zip.getEntry('manifest.json').getData().toString('utf8'));
-  assert.strictEqual(manifest.extension.id, 'publisher.sample');
+  assert.strictEqual(manifest.extension.id, 'Continue.continue');
   assert.strictEqual(manifest.contents.extensionFiles, true);
   assert.strictEqual(manifest.contents.globalStorage, true);
   assert.strictEqual(manifest.contents.currentWorkspaceStorage, true);
+  assert.strictEqual(manifest.contents.externalState, true);
 
   await fs.writeFile(path.join(sampleExt, 'nested', 'feature.txt'), 'stale installed content');
-  await fs.writeFile(path.join(globalStorageRoot, 'publisher.sample', 'state.json'), JSON.stringify({ global: false }));
-  await fs.writeFile(path.join(workspaceStorageRoot, 'publisher.sample', 'workspace.json'), JSON.stringify({ workspace: false }));
+  await fs.writeFile(path.join(globalStorageRoot, 'continue.continue', 'state.json'), JSON.stringify({ global: false }));
+  await fs.writeFile(path.join(workspaceStorageRoot, 'continue.continue', 'workspace.json'), JSON.stringify({ workspace: false }));
+  await fs.writeFile(continueConfigPath, 'stale continue config', 'utf8');
 
   nextOpenDialog = [{ fsPath: archivePath }];
   await registered.get('extensionStateBackup.restoreFromZip')();
 
   assert.strictEqual(await fs.readFile(path.join(sampleExt, 'nested', 'feature.txt'), 'utf8'), 'original extension content');
-  assert.deepStrictEqual(JSON.parse(await fs.readFile(path.join(globalStorageRoot, 'publisher.sample', 'state.json'), 'utf8')), { global: true });
-  assert.deepStrictEqual(JSON.parse(await fs.readFile(path.join(workspaceStorageRoot, 'publisher.sample', 'workspace.json'), 'utf8')), { workspace: true });
-  assert(updatedSettings.some((entry) => entry.key === 'sample.enabled' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.Global));
-  assert(updatedSettings.some((entry) => entry.key === 'sample.enabled' && entry.value === false && entry.target === fakeVscode.ConfigurationTarget.Workspace));
-  assert(updatedSettings.some((entry) => entry.key === 'sample.enabled' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.WorkspaceFolder));
-  assert(updatedSettings.some((entry) => entry.key === 'sample.message' && entry.value === 'hello' && entry.target === fakeVscode.ConfigurationTarget.Global));
+  assert.deepStrictEqual(JSON.parse(await fs.readFile(path.join(globalStorageRoot, 'continue.continue', 'state.json'), 'utf8')), { global: true });
+  assert.deepStrictEqual(JSON.parse(await fs.readFile(path.join(workspaceStorageRoot, 'continue.continue', 'workspace.json'), 'utf8')), { workspace: true });
+  assert.strictEqual(await fs.readFile(continueConfigPath, 'utf8'), continueConfig);
+  assert(updatedSettings.some((entry) => entry.key === 'continue.enableConsole' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.Global));
+  assert(updatedSettings.some((entry) => entry.key === 'continue.enableConsole' && entry.value === false && entry.target === fakeVscode.ConfigurationTarget.Workspace));
+  assert(updatedSettings.some((entry) => entry.key === 'continue.enableConsole' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.WorkspaceFolder));
+  assert(updatedSettings.some((entry) => entry.key === 'continue.enableQuickActions' && entry.value === true && entry.target === fakeVscode.ConfigurationTarget.Global));
 
   console.log(`Smoke test passed: ${path.basename(archivePath)} contained ${entryNames.length} entries and restore replayed ${updatedSettings.length} settings.`);
 }
